@@ -32,6 +32,7 @@ namespace TheGoldenMule.Geo.Editor
             InitializeBuilders();
 
             minSize = new Vector2(168, 300);
+            title = "Geometry";
         }
 
         private void OnGUI()
@@ -40,7 +41,7 @@ namespace TheGoldenMule.Geo.Editor
 
             var index = EditorGUILayout.Popup(_selectedBuilderIndex, _builderNames.ToArray());
 
-            if (index > 0 && _renderers.Count > index)
+            if (index >= 0 && _renderers.Count > index)
             {
                 var renderer = _renderers[index];
                 var builder = _builders[index];
@@ -51,6 +52,8 @@ namespace TheGoldenMule.Geo.Editor
                 }
 
                 renderer.Draw(_settings);
+
+                _selectedBuilderIndex = index;
             }
 
             GUILayout.EndVertical();
@@ -131,25 +134,18 @@ namespace TheGoldenMule.Geo.Editor
 
         private static MethodInfo Factory(IGeometryBuilder builder)
         {
-            var factory = _allFactories
-                .Where(method =>
-                {
-                    var attribute = Attribute<CustomFactory>(method);
-                    if (null != attribute && attribute.Type == builder.GetType())
-                    {
-                        return true;
-                    }
-
-                    return false;
-                })
-                .FirstOrDefault();
-            
-            if (null != factory)
+            foreach (var method in _allFactories)
             {
-                return factory;
+                var attribute = Attribute<CustomFactory>(method);
+                if (null != attribute && attribute.Type == builder.GetType())
+                {
+                    return method;
+                }
             }
             
-            return typeof(GeometryProviderWindow).GetMethod("DefaultFactory", BindingFlags.Static);
+            return typeof(GeometryProviderWindow).GetMethod(
+                "DefaultFactory",
+                BindingFlags.Static | BindingFlags.NonPublic);
         }
 
         private static Type[] Implementors<T>()

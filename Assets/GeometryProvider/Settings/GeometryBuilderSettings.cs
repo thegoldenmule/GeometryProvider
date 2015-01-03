@@ -26,7 +26,7 @@ namespace TheGoldenMule.Geo
     {
         public string Name;
 
-        public GeometryBuilderTransformSettings Transform;
-        public GeometryBuilderUVSettings UV;
+        public GeometryBuilderTransformSettings Transform = new GeometryBuilderTransformSettings();
+        public GeometryBuilderUVSettings UV = new GeometryBuilderUVSettings();
     }
 }
