@@ -1,0 +1,6 @@
+Temp/
+Library/
+UnityVS/
+obj/
+UnityVS.GeometryProvider.*
+Assets/UnityVS.meta
