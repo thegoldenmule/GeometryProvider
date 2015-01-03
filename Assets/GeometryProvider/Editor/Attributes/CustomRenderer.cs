@@ -5,9 +5,10 @@ using System.Text;
 
 namespace TheGoldenMule.Geo.Editor
 {
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class CustomRenderer : Attribute
     {
-        public Type Type;
+        public readonly Type Type;
 
         public CustomRenderer(Type type)
         {

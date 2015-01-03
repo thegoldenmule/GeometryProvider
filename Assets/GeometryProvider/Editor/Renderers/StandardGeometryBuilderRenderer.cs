@@ -7,9 +7,9 @@ namespace TheGoldenMule.Geo.Editor
 {
     public class StandardGeometryBuilderRenderer : IGeometryBuilderRenderer
     {
-        public void Draw(IGeometryBuilder builder)
+        public void Draw(GeometryBuilderSettings settings)
         {
-
+            
         }
     }
 }
