@@ -16,7 +16,7 @@ namespace TheGoldenMule.Geo.Editor
 
         static GeometryProviderWindow()
         {
-            _allFactories.AddRange(MethodsWithAttribute<CustomFactory>());
+            _allFactories.AddRange(TypeUtility.MethodsWithAttribute<CustomFactory>());
         }
 
         private readonly List<string> _builderNames = new List<string>();
@@ -59,9 +59,19 @@ namespace TheGoldenMule.Geo.Editor
             GUILayout.EndVertical();
         }
 
+        private void OnCreatePrimitive()
+        {
+
+        }
+
+        private void OnUpdatePrimitive()
+        {
+
+        }
+
         private void InitializeBuilders()
         {
-            var builderTypes = Implementors<IGeometryBuilder>();
+            var builderTypes = TypeUtility.Implementors<IGeometryBuilder>();
             
             foreach (var builderType in builderTypes)
             {
@@ -70,6 +80,9 @@ namespace TheGoldenMule.Geo.Editor
                     var builder = (IGeometryBuilder) Activator.CreateInstance(builderType);
                     var renderer = Renderer(builder);
                     var factory = Factory(builder);
+
+                    renderer.OnCreate += OnCreatePrimitive;
+                    renderer.OnUpdate += OnUpdatePrimitive;
 
                     _builderNames.Add(Name(builder));
                     _builders.Add(builder);
@@ -87,10 +100,20 @@ namespace TheGoldenMule.Geo.Editor
             }
         }
 
+        private static GameObject CreateGameObject(string name)
+        {
+            var gameObject = new GameObject(name);
+
+            gameObject.AddComponent<MeshFilter>();
+            gameObject.AddComponent<MeshRenderer>();
+
+            return gameObject;
+        }
+
         private static string Name(IGeometryBuilder builder)
         {
             var builderType = builder.GetType();
-            var customName = Attribute<System.ComponentModel.DisplayNameAttribute>(builderType);
+            var customName = TypeUtility.Attribute<System.ComponentModel.DisplayNameAttribute>(builderType);
             if (null != customName)
             {
                 return customName.DisplayName;
@@ -102,11 +125,11 @@ namespace TheGoldenMule.Geo.Editor
         private static IGeometryBuilderRenderer Renderer(IGeometryBuilder builder)
         {
             var builderType = builder.GetType();
-            var rendererTypes = Implementors<IGeometryBuilderRenderer>();
+            var rendererTypes = TypeUtility.Implementors<IGeometryBuilderRenderer>();
 
             foreach (var rendererType in rendererTypes)
             {
-                var customRenderer = Attribute<CustomRenderer>(rendererType);
+                var customRenderer = TypeUtility.Attribute<CustomRenderer>(rendererType);
                 if (null == customRenderer)
                 {
                     continue;
@@ -136,7 +159,7 @@ namespace TheGoldenMule.Geo.Editor
         {
             foreach (var method in _allFactories)
             {
-                var attribute = Attribute<CustomFactory>(method);
+                var attribute = TypeUtility.Attribute<CustomFactory>(method);
                 if (null != attribute && attribute.Type == builder.GetType())
                 {
                     return method;
@@ -146,45 +169,6 @@ namespace TheGoldenMule.Geo.Editor
             return typeof(GeometryProviderWindow).GetMethod(
                 "DefaultFactory",
                 BindingFlags.Static | BindingFlags.NonPublic);
-        }
-
-        private static Type[] Implementors<T>()
-        {
-            return AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => typeof(T).IsAssignableFrom(type) && !type.IsInterface)
-                .ToArray();
-        }
-
-        private static MethodInfo[] MethodsWithAttribute<T>() where T : Attribute
-        {
-            return AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .SelectMany(type => type.GetMethods())
-                .Where(method => method
-                    .GetCustomAttributes(typeof(T), true)
-                    .Any())
-                .ToArray();
-        }
-
-        private static T Attribute<T>(Type type) where T : Attribute
-        {
-            return type
-                .GetCustomAttributes(typeof(T), true)
-                .OfType<T>()
-                .FirstOrDefault<T>();
-        }
-
-        private static T Attribute<T>(MethodInfo method) where T : Attribute
-        {
-            return method
-                .GetCustomAttributes(typeof(T), true)
-                .OfType<T>()
-                .FirstOrDefault<T>();
         }
 
         private static GeometryBuilderSettings DefaultFactory()
