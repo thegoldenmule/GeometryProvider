@@ -31,7 +31,7 @@ namespace TheGoldenMule.Geo
             return true;
         }
 
-        public void BuildCompactPlane(Mesh mesh, PlaneGeometryBuilderSettings settings)
+        private static void BuildCompactPlane(Mesh mesh, PlaneGeometryBuilderSettings settings)
         {
             var xVerts = Mathf.Max(2, settings.NumXVerts);
             var zVerts = Mathf.Max(2, settings.NumZVerts);
@@ -71,7 +71,7 @@ namespace TheGoldenMule.Geo
                 }
             }
 
-            Transform(ref vertices, ref vertices, settings);
+            Transform(ref vertices, settings);
 
             mesh.vertices = vertices;
             mesh.triangles = indices;

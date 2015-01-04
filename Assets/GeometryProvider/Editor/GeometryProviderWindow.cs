@@ -36,7 +36,7 @@ namespace TheGoldenMule.Geo.Editor
             InitializeBuilders();
 
             minSize = new Vector2(168, 300);
-            title = "Geometry";
+            title = "Geo Editor";
         }
 
         private void OnGUI()
@@ -240,5 +240,4 @@ namespace TheGoldenMule.Geo.Editor
             }
         }
     }
-
 }

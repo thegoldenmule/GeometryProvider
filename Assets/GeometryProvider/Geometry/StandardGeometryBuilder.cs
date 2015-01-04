@@ -28,22 +28,14 @@ namespace TheGoldenMule.Geo
 
         }
 
-        protected virtual void Transform(
-            ref Vector3[] inVertices,
-            ref Vector3[] outVertices,
+        protected static void Transform(
+            ref Vector3[] vertices,
             GeometryBuilderSettings settings)
         {
-            if (null == inVertices
-                || null == outVertices
-                || inVertices.Length != outVertices.Length)
-            {
-                return;
-            }
-
             var transformation = settings.Transform.TRS();
-            for (int i = 0, len = inVertices.Length; i < len; i++)
+            for (int i = 0, len = vertices.Length; i < len; i++)
             {
-                outVertices[i] = transformation.MultiplyPoint(inVertices[i]);
+                vertices[i] = transformation.MultiplyPoint(vertices[i]);
             }
         }
     }

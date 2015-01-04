@@ -12,6 +12,7 @@ namespace TheGoldenMule.Geo.Editor
     {
         public event Action OnCreate;
         public event Action OnUpdate;
+        public event Action OnAddBuffer;
 
         public virtual void Draw(GeometryBuilderSettings settings)
         {
@@ -48,7 +49,25 @@ namespace TheGoldenMule.Geo.Editor
 
         protected virtual void DrawBufferControls(GeometryBuilderSettings settings)
         {
+            if (null == settings.Buffers)
+            {
+                return;
+            }
 
+            GUILayout.Label("Buffers");
+
+            EditorGUI.indentLevel++;
+            for (int i = 0, len = settings.Buffers.Length; i < len; i++)
+            {
+
+            }
+
+            if (GUILayout.Button("Add") && null != OnAddBuffer)
+            {
+                OnAddBuffer();
+            }
+
+            EditorGUI.indentLevel--;
         }
 
         protected virtual void DrawBuildControls(GeometryBuilderSettings settings)
