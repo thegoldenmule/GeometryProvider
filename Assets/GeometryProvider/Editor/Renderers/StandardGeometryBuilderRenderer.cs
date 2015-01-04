@@ -13,35 +13,42 @@ namespace TheGoldenMule.Geo.Editor
         public event Action OnCreate;
         public event Action OnUpdate;
 
-        public void Draw(GeometryBuilderSettings settings)
+        public virtual void Draw(GeometryBuilderSettings settings)
         {
             GUILayout.BeginVertical();
 
-            DrawTransformControls(settings.Transform);
-            DrawUVControls(settings.UV);
+            DrawIntro(settings);
+            DrawTransformControls(settings);
+            DrawBufferControls(settings);
             DrawBuildControls(settings);
 
             GUILayout.EndVertical();
         }
 
-        protected virtual void DrawTransformControls(GeometryBuilderTransformSettings settings)
+        protected virtual void DrawIntro(GeometryBuilderSettings settings)
+        {
+            GUILayout.Label(settings.Name ?? "");
+
+            EditorGUI.indentLevel++;
+            GUILayout.TextArea(settings.Description ?? "");
+            EditorGUI.indentLevel--;
+        }
+
+        protected virtual void DrawTransformControls(GeometryBuilderSettings settings)
         {
             GUILayout.Label("Transform");
 
             EditorGUI.indentLevel++;
-            settings.Scale = EditorGUILayout.Vector3Field("Scale", settings.Scale);
-            settings.Rotation.eulerAngles = EditorGUILayout.Vector3Field("Rotation", settings.Rotation.eulerAngles);
-            settings.Material = (Material) EditorGUILayout.ObjectField("Material", settings.Material, typeof(Material), false);
+            settings.Transform.Translation = EditorGUILayout.Vector3Field("Translation", settings.Transform.Translation);
+            settings.Transform.Scale = EditorGUILayout.Vector3Field("Scale", settings.Transform.Scale);
+            settings.Transform.Rotation.eulerAngles = EditorGUILayout.Vector3Field("Rotation", settings.Transform.Rotation.eulerAngles);
+            settings.Transform.CustomDeformation = (Material) EditorGUILayout.ObjectField("Material", settings.Transform.CustomDeformation, typeof(Material), false);
             EditorGUI.indentLevel--;
         }
 
-        protected virtual void DrawUVControls(GeometryBuilderUVSettings settings)
+        protected virtual void DrawBufferControls(GeometryBuilderSettings settings)
         {
-            GUILayout.Label("UV");
 
-            EditorGUI.indentLevel++;
-            settings.Rect = EditorGUILayout.RectField("Rect", settings.Rect);
-            EditorGUI.indentLevel--;
         }
 
         protected virtual void DrawBuildControls(GeometryBuilderSettings settings)

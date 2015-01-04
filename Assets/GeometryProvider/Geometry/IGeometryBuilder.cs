@@ -6,6 +6,6 @@ namespace TheGoldenMule.Geo
     public interface IGeometryBuilder
     {
         void Initialize();
-        void Build(Mesh mesh, GeometryBuilderSettings settings);
+        bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error);
     }
 }

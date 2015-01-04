@@ -10,23 +10,58 @@ namespace TheGoldenMule.Geo
     [Serializable]
     public class GeometryBuilderTransformSettings
     {
-        public Vector3 Scale;
+        public Vector3 Translation;
         public Quaternion Rotation;
-        public Material Material;
+        public Vector3 Scale;
+        public Material CustomDeformation;
+
+        public Matrix4x4 TRS()
+        {
+            return Matrix4x4.TRS(
+                Translation,
+                Rotation,
+                Scale);
+        }
     }
 
     [Serializable]
-    public class GeometryBuilderUVSettings
+    public class GeometryBuilderBufferSettings
     {
-        public Rect Rect = new Rect(0, 0, 1f, 1f);
+        public enum MeshBuffer
+        {
+            UV,
+            UV2,
+            Color,
+            Normal,
+            Tangent
+        }
+
+        public MeshBuffer Buffer;
     }
 
     [Serializable]
     public class GeometryBuilderSettings
     {
+        /// <summary>
+        /// Descriptive name. This is used by the editor and will be null at
+        /// runtime.
+        /// </summary>
+        [NonSerialized]
         public string Name;
 
+        /// <summary>
+        /// Description of builder. This is used by the editor and will be null
+        /// at runtime.
+        /// </summary>
+        [NonSerialized]
+        public string Description;
+
+        /// <summary>
+        /// If true, allows verts to be shared between triangles. If false,
+        /// each triangle will have its own verts.
+        /// </summary>
+        public bool ShareVerts = true;
         public GeometryBuilderTransformSettings Transform = new GeometryBuilderTransformSettings();
-        public GeometryBuilderUVSettings UV = new GeometryBuilderUVSettings();
+        public GeometryBuilderBufferSettings[] Buffers;
     }
 }

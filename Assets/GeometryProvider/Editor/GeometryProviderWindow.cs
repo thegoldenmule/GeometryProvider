@@ -26,6 +26,10 @@ namespace TheGoldenMule.Geo.Editor
 
         private int _selectedBuilderIndex = -1;
         private GeometryBuilderSettings _settings;
+        private IGeometryBuilder _builder;
+        private IGeometryBuilderRenderer _renderer;
+        private GameObject _gameObject;
+        private Mesh _mesh;
 
         private void OnEnable()
         {
@@ -39,19 +43,22 @@ namespace TheGoldenMule.Geo.Editor
         {
             GUILayout.BeginVertical();
 
-            var index = EditorGUILayout.Popup(_selectedBuilderIndex, _builderNames.ToArray());
+            var index = Mathf.Max(EditorGUILayout.Popup(_selectedBuilderIndex, _builderNames.ToArray()), 0);
 
             if (index >= 0 && _renderers.Count > index)
             {
-                var renderer = _renderers[index];
-                var builder = _builders[index];
-
                 if (index != _selectedBuilderIndex)
                 {
                     _settings = (GeometryBuilderSettings) _factories[index].Invoke(null, null);
+
+                    _renderer = _renderers[index];
+                    _builder = _builders[index];
+
+                    _settings.Name = Name(_builder);
+                    _settings.Description = Description(_builder);
                 }
 
-                renderer.Draw(_settings);
+                _renderer.Draw(_settings);
 
                 _selectedBuilderIndex = index;
             }
@@ -61,12 +68,38 @@ namespace TheGoldenMule.Geo.Editor
 
         private void OnCreatePrimitive()
         {
+            if (null != _gameObject)
+            {
+                if (Application.isPlaying)
+                {
+                    UnityEngine.Object.Destroy(_gameObject);
+                }
+                else
+                {
+                    UnityEngine.Object.DestroyImmediate(_gameObject);
+                }
+            }
 
+            _gameObject = CreateGameObject("Primitive");
+            _mesh = new Mesh();
+
+            _gameObject.GetComponent<MeshFilter>().sharedMesh = _mesh;
+
+            OnUpdatePrimitive();
         }
 
         private void OnUpdatePrimitive()
         {
+            if (null == _gameObject || null == _builder)
+            {
+                return;
+            }
 
+            string error;
+            if (!_builder.Build(_mesh, _settings, out error))
+            {
+                Debug.LogError(string.Format("Could not build mesh : {0}.", error));
+            }
         }
 
         private void InitializeBuilders()
@@ -75,6 +108,11 @@ namespace TheGoldenMule.Geo.Editor
             
             foreach (var builderType in builderTypes)
             {
+                if (builderType.IsAbstract)
+                {
+                    continue;
+                }
+
                 try
                 {
                     var builder = (IGeometryBuilder) Activator.CreateInstance(builderType);
@@ -120,6 +158,18 @@ namespace TheGoldenMule.Geo.Editor
             }
 
             return builderType.Name;
+        }
+
+        private static string Description(IGeometryBuilder builder)
+        {
+            var builderType = builder.GetType();
+            var customName = TypeUtility.Attribute<System.ComponentModel.DescriptionAttribute>(builderType);
+            if (null != customName)
+            {
+                return customName.Description;
+            }
+
+            return "[No description]";
         }
 
         private static IGeometryBuilderRenderer Renderer(IGeometryBuilder builder)
@@ -176,7 +226,7 @@ namespace TheGoldenMule.Geo.Editor
             return new GeometryBuilderSettings();
         }
 
-        [MenuItem("Tools/Geometry Provider %g")]
+        [MenuItem("GameObject/Geometry Editor %g")]
         private static void Toggle()
         {
             EditorWindow.GetWindow<GeometryProviderWindow>();

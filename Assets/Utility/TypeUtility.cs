@@ -22,7 +22,7 @@ namespace TheGoldenMule
                 .CurrentDomain
                 .GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
-                .SelectMany(type => type.GetMethods())
+                .SelectMany(type => type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
                 .Where(method => method
                     .GetCustomAttributes(typeof(T), true)
                     .Any())
