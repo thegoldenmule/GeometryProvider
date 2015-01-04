@@ -14,21 +14,8 @@ namespace TheGoldenMule.Geo
             error = string.Empty;
 
             var polygonSettings = (PolygonGeometryBuilderSettings) settings;
-            if (polygonSettings.Convex)
-            {
-                BuildConvexPolygon(mesh, polygonSettings);
-            }
-            else
-            {
-                BuildStarPolygon(mesh, polygonSettings);
-            }
 
-            return true;
-        }
-
-        private static void BuildConvexPolygon(Mesh mesh, PolygonGeometryBuilderSettings settings)
-        {
-            var numSides = Mathf.Max(3, settings.NumSides);
+            var numSides = Mathf.Max(3, polygonSettings.NumSides);
             var numVerts = numSides + 1;
             var numTriangles = numSides;
             var numIndices = numTriangles * 3;
@@ -61,11 +48,8 @@ namespace TheGoldenMule.Geo
 
             mesh.vertices = vertices;
             mesh.triangles = indices;
-        }
 
-        private static void BuildStarPolygon(Mesh mesh, PolygonGeometryBuilderSettings settings)
-        {
-
+            return true;
         }
 
         [CustomFactory(typeof(PolygonGeometryBuilder))]

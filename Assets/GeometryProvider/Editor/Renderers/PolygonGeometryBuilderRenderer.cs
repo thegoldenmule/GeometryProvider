@@ -24,7 +24,6 @@ namespace TheGoldenMule.Geo.Editor
 
             EditorGUI.indentLevel++;
             polygonSettings.NumSides = Mathf.Max(3, EditorGUILayout.IntField("Number of Sides", polygonSettings.NumSides));
-            polygonSettings.Convex = EditorGUILayout.Toggle("Convex", polygonSettings.Convex);
             EditorGUI.indentLevel--;
         }
     }
