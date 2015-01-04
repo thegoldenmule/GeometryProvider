@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 using UnityEngine;
 
 namespace TheGoldenMule.Geo
 {
+    [DisplayName("Polygon")]
+    [Description("Builds any regular polygon.")]
     public class PolygonGeometryBuilder : StandardGeometryBuilder
     {
         public override bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error)
