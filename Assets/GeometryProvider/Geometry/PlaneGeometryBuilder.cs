@@ -50,7 +50,10 @@ namespace TheGoldenMule.Geo
             {
                 for (int z = 0; z < zVerts; z++)
                 {
-                    vertices[x + z * xVerts] = new Vector3(x * invXVerts, 0, z * invZVerts);
+                    vertices[x + z * xVerts] = new Vector3(
+                        x * invXVerts - 0.5f,
+                        0,
+                        z * invZVerts - 0.5f);
                 }
             }
 

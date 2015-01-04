@@ -10,6 +10,8 @@ namespace TheGoldenMule.Geo.Editor
         event Action OnCreate;
         event Action OnUpdate;
 
+        bool IsLiveUpdate { get; }
+
         void Draw(GeometryBuilderSettings settings);
     }
 }

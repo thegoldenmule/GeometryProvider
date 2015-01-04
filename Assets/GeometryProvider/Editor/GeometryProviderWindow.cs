@@ -85,6 +85,8 @@ namespace TheGoldenMule.Geo.Editor
 
             _gameObject.GetComponent<MeshFilter>().sharedMesh = _mesh;
 
+            EditorUtility.SelectAndFocus(_gameObject.transform);
+
             OnUpdatePrimitive();
         }
 

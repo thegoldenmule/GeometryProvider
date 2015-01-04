@@ -14,6 +14,14 @@ namespace TheGoldenMule.Geo.Editor
         public event Action OnUpdate;
         public event Action OnAddBuffer;
 
+        protected string _buildTabState;
+
+        public virtual bool IsLiveUpdate
+        {
+            get;
+            private set;
+        }
+
         public virtual void Draw(GeometryBuilderSettings settings)
         {
             GUILayout.BeginVertical();
@@ -74,12 +82,31 @@ namespace TheGoldenMule.Geo.Editor
         {
             GUILayout.Label("Build");
 
+            _buildTabState = EditorUtility.DrawTabs(
+                _buildTabState,
+                new Tab("Create", DrawBuildCreate),
+                new Tab("Update", DrawBuildUpdate),
+                new Tab("Save", DrawBuildSave));
+        }
+
+        protected virtual void DrawBuildCreate()
+        {
             EditorGUI.indentLevel++;
             if (GUILayout.Button("Create") && null != OnCreate)
             {
                 OnCreate();
             }
             EditorGUI.indentLevel--;
+        }
+
+        protected virtual void DrawBuildUpdate()
+        {
+
+        }
+
+        protected virtual void DrawBuildSave()
+        {
+
         }
     }
 }
