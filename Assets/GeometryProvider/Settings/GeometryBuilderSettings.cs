@@ -61,6 +61,7 @@ namespace TheGoldenMule.Geo
         /// each triangle will have its own verts.
         /// </summary>
         public bool ShareVerts = true;
+
         public GeometryBuilderTransformSettings Transform = new GeometryBuilderTransformSettings();
         public GeometryBuilderBufferSettings[] Buffers;
     }
