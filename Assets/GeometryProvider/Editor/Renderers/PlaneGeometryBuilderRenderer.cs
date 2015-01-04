@@ -8,6 +8,7 @@ using UnityEditor;
 
 namespace TheGoldenMule.Geo.Editor
 {
+    [CustomRenderer(typeof(PlaneGeometryBuilder))]
     public class PlaneGeometryBuilderRenderer : StandardGeometryBuilderRenderer
     {
         protected override void DrawTransformControls(GeometryBuilderSettings settings)
@@ -18,8 +19,8 @@ namespace TheGoldenMule.Geo.Editor
 
             GUILayout.Label("Plane");
             EditorGUI.indentLevel++;
-            EditorGUILayout.IntSlider("Num X Vertices", planeSettings.NumXVerts, 2, 1000);
-            EditorGUILayout.IntSlider("Num Z Vertices", planeSettings.NumZVerts, 2, 1000);
+            planeSettings.NumXVerts = Mathf.Max(EditorGUILayout.IntField("Num X Vertices", planeSettings.NumXVerts), 2);
+            planeSettings.NumZVerts = Mathf.Max(EditorGUILayout.IntField("Num Z Vertices", planeSettings.NumZVerts), 2);
             EditorGUI.indentLevel--;
         }
     }

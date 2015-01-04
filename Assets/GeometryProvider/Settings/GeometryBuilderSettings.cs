@@ -10,9 +10,9 @@ namespace TheGoldenMule.Geo
     [Serializable]
     public class GeometryBuilderTransformSettings
     {
-        public Vector3 Translation;
-        public Quaternion Rotation;
-        public Vector3 Scale;
+        public Vector3 Translation = Vector3.zero;
+        public Quaternion Rotation = Quaternion.identity;
+        public Vector3 Scale = Vector3.one;
         public Material CustomDeformation;
 
         public Matrix4x4 TRS()

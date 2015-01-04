@@ -47,7 +47,7 @@ namespace TheGoldenMule.Geo.Editor
 
             if (index >= 0 && _renderers.Count > index)
             {
-                if (index != _selectedBuilderIndex)
+                if (index != _selectedBuilderIndex || null == _renderer)
                 {
                     _settings = (GeometryBuilderSettings) _factories[index].Invoke(null, null);
 
@@ -229,7 +229,15 @@ namespace TheGoldenMule.Geo.Editor
         [MenuItem("GameObject/Geometry Editor %g")]
         private static void Toggle()
         {
-            EditorWindow.GetWindow<GeometryProviderWindow>();
+            var window = EditorWindow.FindObjectOfType<GeometryProviderWindow>();
+            if (null != window)
+            {
+                window.Close();
+            }
+            else
+            {
+                EditorWindow.GetWindow<GeometryProviderWindow>();
+            }
         }
     }
 

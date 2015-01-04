@@ -21,10 +21,7 @@ namespace TheGoldenMule.Geo
 
             var planeSettings = (PlaneGeometryBuilderSettings) settings;
 
-            var xVerts = Mathf.Max(planeSettings.NumXVerts, 2);
-            var zVerts = Mathf.Max(planeSettings.NumZVerts, 2);
-
-            BuildCompactPlane(mesh, xVerts, zVerts);
+            BuildCompactPlane(mesh, planeSettings);
 
             if (!settings.ShareVerts)
             {
@@ -34,8 +31,11 @@ namespace TheGoldenMule.Geo
             return true;
         }
 
-        public static void BuildCompactPlane(Mesh mesh, int xVerts, int zVerts)
+        public void BuildCompactPlane(Mesh mesh, PlaneGeometryBuilderSettings settings)
         {
+            var xVerts = Mathf.Max(2, settings.NumXVerts);
+            var zVerts = Mathf.Max(2, settings.NumZVerts);
+            
             var numQuads = (xVerts - 1) * (zVerts - 1);
             var numVerts = xVerts * zVerts;
             var numIndices = numQuads * 6;
@@ -70,6 +70,8 @@ namespace TheGoldenMule.Geo
                     indices[index + 5] = x + 1 + (z + 1) * xVerts;
                 }
             }
+
+            Transform(ref vertices, ref vertices, settings);
 
             mesh.vertices = vertices;
             mesh.triangles = indices;
