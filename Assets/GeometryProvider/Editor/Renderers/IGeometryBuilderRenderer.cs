@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace TheGoldenMule.Geo.Editor
 {
@@ -11,6 +12,7 @@ namespace TheGoldenMule.Geo.Editor
         event Action OnUpdate;
 
         bool IsLiveUpdate { get; }
+        Transform Selected { get; set; }
 
         void Draw(GeometryBuilderSettings settings);
     }

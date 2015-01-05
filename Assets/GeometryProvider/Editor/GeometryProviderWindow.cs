@@ -68,24 +68,17 @@ namespace TheGoldenMule.Geo.Editor
 
         private void OnCreatePrimitive()
         {
-            if (null != _gameObject)
-            {
-                if (Application.isPlaying)
-                {
-                    UnityEngine.Object.Destroy(_gameObject);
-                }
-                else
-                {
-                    UnityEngine.Object.DestroyImmediate(_gameObject);
-                }
-            }
-
             _gameObject = CreateGameObject("Primitive");
             _mesh = new Mesh();
 
             _gameObject.GetComponent<MeshFilter>().sharedMesh = _mesh;
 
+            // select the new primitive
             EditorUtility.SelectAndFocus(_gameObject.transform);
+            if (null != _renderer)
+            {
+                _renderer.Selected = _gameObject.transform;
+            }
 
             OnUpdatePrimitive();
         }

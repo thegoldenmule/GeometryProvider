@@ -76,8 +76,7 @@ namespace TheGoldenMule.Geo
 
             Transform(ref vertices, settings);
 
-            mesh.vertices = vertices;
-            mesh.triangles = indices;
+            mesh.Apply(ref vertices, ref indices);
         }
 
         [CustomFactory(typeof(PlaneGeometryBuilder))]

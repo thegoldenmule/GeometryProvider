@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using UnityEditor;
 using UnityEngine;
@@ -12,14 +9,19 @@ namespace TheGoldenMule.Geo.Editor
     {
         public event Action OnCreate;
         public event Action OnUpdate;
-        public event Action OnAddBuffer;
-
+        
         protected string _buildTabState;
-
+        
         public virtual bool IsLiveUpdate
         {
             get;
             private set;
+        }
+
+        public virtual Transform Selected
+        {
+            get;
+            set;
         }
 
         public virtual void Draw(GeometryBuilderSettings settings)
@@ -28,7 +30,6 @@ namespace TheGoldenMule.Geo.Editor
 
             DrawIntro(settings);
             DrawTransformControls(settings);
-            DrawBufferControls(settings);
             DrawBuildControls(settings);
 
             GUILayout.EndVertical();
@@ -55,29 +56,6 @@ namespace TheGoldenMule.Geo.Editor
             EditorGUI.indentLevel--;
         }
 
-        protected virtual void DrawBufferControls(GeometryBuilderSettings settings)
-        {
-            if (null == settings.Buffers)
-            {
-                return;
-            }
-
-            GUILayout.Label("Buffers");
-
-            EditorGUI.indentLevel++;
-            for (int i = 0, len = settings.Buffers.Length; i < len; i++)
-            {
-
-            }
-
-            if (GUILayout.Button("Add") && null != OnAddBuffer)
-            {
-                OnAddBuffer();
-            }
-
-            EditorGUI.indentLevel--;
-        }
-
         protected virtual void DrawBuildControls(GeometryBuilderSettings settings)
         {
             GUILayout.Label("Build");
@@ -92,16 +70,31 @@ namespace TheGoldenMule.Geo.Editor
         protected virtual void DrawBuildCreate()
         {
             EditorGUI.indentLevel++;
-            if (GUILayout.Button("Create") && null != OnCreate)
+            
+            if (GUILayout.Button("Create New") && null != OnCreate)
             {
                 OnCreate();
             }
+
             EditorGUI.indentLevel--;
         }
 
         protected virtual void DrawBuildUpdate()
         {
+            EditorGUI.indentLevel++;
 
+            Selected = (Transform) EditorGUILayout.ObjectField("Primitive", Selected, typeof (Transform));
+
+            GUI.enabled = null != Selected;
+            IsLiveUpdate = EditorGUILayout.Toggle("Live Update", IsLiveUpdate);
+
+            if (IsLiveUpdate && null != OnUpdate)
+            {
+                OnUpdate();
+            }
+
+            EditorGUI.indentLevel--;
+            GUI.enabled = true;
         }
 
         protected virtual void DrawBuildSave()
