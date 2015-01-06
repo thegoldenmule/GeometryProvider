@@ -59,12 +59,12 @@ namespace TheGoldenMule.Geo
         /// </summary>
         public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
-            var verts = Vertices;
+            var vertices = Vertices;
             var triangles = Triangles;
 
-            Transform(ref verts, settings);
+            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
 
-            mesh.Apply(ref verts, ref triangles);
+            ApplyAllDefaults(mesh, settings);
         }
     }
 }

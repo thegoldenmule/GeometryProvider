@@ -4,8 +4,6 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Reflection;
 using System;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace TheGoldenMule.Geo.Editor
 {
@@ -43,7 +41,10 @@ namespace TheGoldenMule.Geo.Editor
         {
             GUILayout.BeginVertical();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Primitive");
             var index = Mathf.Max(EditorGUILayout.Popup(_selectedBuilderIndex, _builderNames.ToArray()), 0);
+            GUILayout.EndHorizontal();
 
             if (index >= 0 && _renderers.Count > index)
             {
@@ -134,7 +135,8 @@ namespace TheGoldenMule.Geo.Editor
             var gameObject = new GameObject(name);
 
             gameObject.AddComponent<MeshFilter>();
-            gameObject.AddComponent<MeshRenderer>();
+            var renderer = gameObject.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
 
             return gameObject;
         }

@@ -13,10 +13,8 @@ namespace TheGoldenMule.Geo.Editor
         /// Draws cylinder specific controls.
         /// </summary>
         /// <param name="settings"></param>
-        protected override void DrawTransformControls(GeometryBuilderSettings settings)
+        protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
-            base.DrawTransformControls(settings);
-
             var cylinderSettings = (CylinderGeometryBuilderSettings) settings;
 
             GUILayout.Label("Cylinder");

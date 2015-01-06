@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using UnityEditor;
 using UnityEngine;
 
 namespace TheGoldenMule.Geo.Editor
 {
+    /// <summary>
+    /// For creating tabbed interfaces.
+    /// </summary>
     public class Tab
     {
         public readonly string Name;
@@ -20,6 +20,9 @@ namespace TheGoldenMule.Geo.Editor
         }
     }
 
+    /// <summary>
+    /// Various in-editor functions.
+    /// </summary>
     public static class EditorUtility
     {
         public static string DrawTabs(
@@ -50,12 +53,12 @@ namespace TheGoldenMule.Geo.Editor
                     }
 
                     GUI.enabled = false;
-                    GUILayout.Button(tab.Name);
+                    GUILayout.Button(tab.Name, GUILayout.Height(25));
                     GUI.enabled = true;
                 }
                 else
                 {
-                    if (GUILayout.Button(tab.Name))
+                    if (GUILayout.Button(tab.Name, GUILayout.Height(25)))
                     {
                         selectedTab = tab;
                     }
@@ -64,7 +67,9 @@ namespace TheGoldenMule.Geo.Editor
 
             GUILayout.EndHorizontal();
 
-            if (null != selectedTab.OnDraw)
+            EditorGUILayout.Separator();
+
+            if (null != selectedTab && null != selectedTab.OnDraw)
             {
                 selectedTab.OnDraw();
             }

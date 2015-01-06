@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace TheGoldenMule.Geo.Editor
 {
+    /// <summary>
+    /// Interface for custom primitive renderers.
+    /// </summary>
     public interface IGeometryBuilderRenderer
     {
         event Action OnCreate;

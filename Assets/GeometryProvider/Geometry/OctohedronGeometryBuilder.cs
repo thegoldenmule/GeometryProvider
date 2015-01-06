@@ -10,7 +10,7 @@ namespace TheGoldenMule.Geo
     [Description("Builds a polyhedron with 8 faces.")]
     public class OctohedronGeometryBuilder : StandardGeometryBuilder
     {
-        public static Vector3[] Vertices =
+        public static readonly Vector3[] Vertices =
         {
             new Vector3(1, 0, 0),
             new Vector3(-1, 0, 0),
@@ -20,7 +20,7 @@ namespace TheGoldenMule.Geo
             new Vector3(0, 0, -1)
         };
 
-        public static int[] Triangles =
+        public static readonly int[] Triangles =
         {
             4, 0, 2,
             4, 2, 1,
@@ -35,10 +35,11 @@ namespace TheGoldenMule.Geo
         public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
             var vertices = Vertices;
-            
-            Transform(ref vertices, settings);
+            var triangles = Triangles;
 
-            mesh.Apply(ref vertices, ref Triangles);
+            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+
+            ApplyAllDefaults(mesh, settings);
         }
     }
 }

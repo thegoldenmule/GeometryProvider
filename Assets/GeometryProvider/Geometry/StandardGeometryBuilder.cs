@@ -9,25 +9,22 @@ namespace TheGoldenMule.Geo
             // 
         }
 
-        public virtual void Build(Mesh mesh, GeometryBuilderSettings settings)
+        public virtual void Build(
+            Mesh mesh,
+            GeometryBuilderSettings settings)
         {
             
         }
 
-        protected virtual void UnshareVerts(Mesh mesh)
-        {
-
-        }
-
-        protected static void Transform(
-            ref Vector3[] vertices,
+        public virtual void ApplyAllDefaults(
+            Mesh mesh,
             GeometryBuilderSettings settings)
         {
-            var transformation = settings.Transform.TRS();
-            for (int i = 0, len = vertices.Length; i < len; i++)
-            {
-                vertices[i] = transformation.MultiplyPoint(vertices[i]);
-            }
+            settings.UV.ApplyDefault(mesh);
+            settings.UV2.ApplyDefault(mesh);
+            settings.Color.ApplyDefault(mesh);
+            settings.Tangents.ApplyDefault(mesh);
+            settings.Normals.ApplyDefault(mesh);
         }
     }
 }

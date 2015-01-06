@@ -12,11 +12,8 @@ namespace TheGoldenMule.Geo.Editor
         /// <summary>
         /// Draws pyramid specific controls.
         /// </summary>
-        /// <param name="settings"></param>
-        protected override void DrawTransformControls(GeometryBuilderSettings settings)
+        protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
-            base.DrawTransformControls(settings);
-
             var pyramid = (PyramidGeometryBuilderSettings) settings;
 
             GUILayout.Label("Pyramid");

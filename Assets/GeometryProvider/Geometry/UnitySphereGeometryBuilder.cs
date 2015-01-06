@@ -21,8 +21,9 @@ namespace TheGoldenMule.Geo
             var vertices = sphereMesh.vertices;
             var triangles = sphereMesh.triangles;
 
-            Transform(ref vertices, settings);
-            mesh.Apply(ref vertices, ref triangles);
+            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+
+            ApplyAllDefaults(mesh, settings);
 
             if (Application.isPlaying)
             {

@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 namespace TheGoldenMule.Geo.Editor
 {
+    /// <summary>
+    /// Renders custom controls for Plane.
+    /// </summary>
     [CustomRenderer(typeof(PlaneGeometryBuilder))]
     public class PlaneGeometryBuilderRenderer : StandardGeometryBuilderRenderer
     {
-        protected override void DrawTransformControls(GeometryBuilderSettings settings)
+        protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
-            base.DrawTransformControls(settings);
-
             PlaneGeometryBuilderSettings planeSettings = (PlaneGeometryBuilderSettings) settings;
 
             GUILayout.Label("Plane");

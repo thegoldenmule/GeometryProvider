@@ -7,14 +7,14 @@ namespace TheGoldenMule.Geo
     /// Constructs a platonic solid! The Dodecahedron.
     /// </summary>
     [DisplayName("Dodecahedron")]
-    [Description("Builds a polyhedron with 12 faces.")]
+    [Description("Builds a regular polyhedron with 12 faces.")]
     public class DodecahedronGeometryBuilder : StandardGeometryBuilder
     {
         private static readonly float A = 1f / Mathf.Sqrt(3);
         private static readonly float B = Mathf.Sqrt((3 - Mathf.Sqrt(5)) / 6);
         private static readonly float C = Mathf.Sqrt((3 + Mathf.Sqrt(5)) / 6);
 
-        public static Vector3[] Vertices =
+        public static readonly Vector3[] Vertices =
         {
             new Vector3(A, A, A),
             new Vector3(A, A, -A),
@@ -42,7 +42,7 @@ namespace TheGoldenMule.Geo
             new Vector3(0, -B, -C)
         };
 
-        public static int[] Triangles =
+        public static readonly int[] Triangles =
         {
             0, 8, 9, 0, 9, 4, 0, 4, 16,
             0, 16, 17, 0, 17, 2, 0, 2, 12,
@@ -62,10 +62,11 @@ namespace TheGoldenMule.Geo
         public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
             var vertices = Vertices;
-            
-            Transform(ref vertices, settings);
+            var triangles = Triangles;
 
-            mesh.Apply(ref vertices, ref Triangles);
+            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+
+            ApplyAllDefaults(mesh, settings);
         }
     }
 }

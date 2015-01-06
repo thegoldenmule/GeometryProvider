@@ -14,10 +14,6 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Builds geometry for a circle.
         /// </summary>
-        /// <param name="mesh"></param>
-        /// <param name="settings"></param>
-        /// <param name="error"></param>
-        /// <returns></returns>
         public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
             var polygonSettings = (CircleGeometryBuilderSettings) settings;
@@ -36,9 +32,9 @@ namespace TheGoldenMule.Geo
                 ref vertices,
                 ref triangles);
 
-            Transform(ref vertices, settings);
+            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
 
-            mesh.Apply(ref vertices, ref triangles);
+            ApplyAllDefaults(mesh, settings);
         }
 
         /// <summary>

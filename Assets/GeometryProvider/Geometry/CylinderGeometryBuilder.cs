@@ -153,8 +153,9 @@ namespace TheGoldenMule.Geo
             }
 
             // remaining transformation + application
-            Transform(ref vertices, settings);
-            mesh.Apply(ref vertices, ref triangles);
+            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+
+            ApplyAllDefaults(mesh, settings);
         }
 
         /// <summary>

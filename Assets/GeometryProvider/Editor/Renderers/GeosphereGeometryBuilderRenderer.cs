@@ -10,13 +10,11 @@ namespace TheGoldenMule.Geo.Editor
     public class GeosphereGeometryBuilderRenderer : StandardGeometryBuilderRenderer
     {
         /// <summary>
-        /// Draws Geosphere settings after transform controls.
+        /// Draws Geosphere settings.
         /// </summary>
         /// <param name="settings"></param>
-        protected override void DrawTransformControls(GeometryBuilderSettings settings)
+        protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
-            base.DrawTransformControls(settings);
-
             var geosphereSettings = (GeosphereGeometryBuilderSettings) settings;
 
             GUILayout.Label("Geosphere");

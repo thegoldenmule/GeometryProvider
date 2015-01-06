@@ -15,14 +15,9 @@ namespace TheGoldenMule.Geo
             var planeSettings = (PlaneGeometryBuilderSettings) settings;
 
             BuildCompactPlane(mesh, planeSettings);
-
-            if (!settings.ShareVerts)
-            {
-                UnshareVerts(mesh);
-            }
         }
 
-        private static void BuildCompactPlane(Mesh mesh, PlaneGeometryBuilderSettings settings)
+        private void BuildCompactPlane(Mesh mesh, PlaneGeometryBuilderSettings settings)
         {
             var xVerts = Mathf.Max(2, settings.NumXVerts);
             var zVerts = Mathf.Max(2, settings.NumZVerts);
@@ -32,7 +27,7 @@ namespace TheGoldenMule.Geo
             var numIndices = numQuads * 6;
 
             var vertices = new Vector3[numVerts];
-            var indices = new int[numIndices];
+            var triangles = new int[numIndices];
 
             var invXVerts = 1f / (xVerts - 1);
             var invZVerts = 1f / (zVerts - 1);
@@ -55,19 +50,19 @@ namespace TheGoldenMule.Geo
                     var quadIndex = x + z * (xVerts - 1);
                     var index = quadIndex * 6;
 
-                    indices[index] = x + z * xVerts;
-                    indices[index + 1] = x + 1 + (z + 1) * xVerts;
-                    indices[index + 2] = x + 1 + z * xVerts;
+                    triangles[index] = x + z * xVerts;
+                    triangles[index + 1] = x + 1 + (z + 1) * xVerts;
+                    triangles[index + 2] = x + 1 + z * xVerts;
 
-                    indices[index + 3] = x + z * xVerts;
-                    indices[index + 4] = x + (z + 1) * xVerts;
-                    indices[index + 5] = x + 1 + (z + 1) * xVerts;
+                    triangles[index + 3] = x + z * xVerts;
+                    triangles[index + 4] = x + (z + 1) * xVerts;
+                    triangles[index + 5] = x + 1 + (z + 1) * xVerts;
                 }
             }
 
-            Transform(ref vertices, settings);
+            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
 
-            mesh.Apply(ref vertices, ref indices);
+            ApplyAllDefaults(mesh, settings);
         }
 
         [CustomFactory(typeof(PlaneGeometryBuilder))]

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+using TheGoldenMule.Geo;
+
 /// <summary>
 /// Extensions for UnityEngine.Mesh.
 /// </summary>
@@ -10,9 +12,6 @@ public static class MeshExtensions
     /// In order to avoid expensive Mesh::Clear() calls, the order in which
     /// the vert and index buffers are assigned to the mesh matters.
     /// </summary>
-    /// <param name="this"></param>
-    /// <param name="vertices"></param>
-    /// <param name="indices"></param>
     public static void Apply(this Mesh @this, ref Vector3[] vertices, ref int[] indices)
     {
         if (@this.vertexCount > vertices.Length)
@@ -25,6 +24,144 @@ public static class MeshExtensions
             @this.vertices = vertices;
             @this.triangles = indices;
         }
+    }
+
+    /// <summary>
+    /// Sets a buffer.
+    /// </summary>
+    public static void SetBuffer(this Mesh @this, Buffer buffer, ref object contents)
+    {
+        switch (buffer)
+        {
+            case Buffer.Vertex:
+            {
+                @this.vertices = (Vector3[]) contents;
+
+                break;
+            }
+            case Buffer.UV:
+            {
+                @this.uv = (Vector2[]) contents;
+
+                break;
+            }
+            case Buffer.UV2:
+            {
+                @this.uv2 = (Vector2[]) contents;
+
+                break;
+            }
+            case Buffer.Color:
+            {
+                @this.colors = (Color[]) contents;
+
+                break;
+            }
+            case Buffer.Normal:
+            {
+                @this.normals = (Vector3[]) contents;
+
+                break;
+            }
+            case Buffer.Tangent:
+            {
+                @this.tangents = (Vector4[]) contents;
+
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Recalculates tangents. Based on:
+    /// 
+    /// Lengyel, Eric. "Computing Tangent Space Basis Vectors for an Arbitrary Mesh". Terathon Software 3D Graphics Library, 2001.
+    /// http://www.terathon.com/code/tangent.html
+    /// </summary>
+    /// <param name="this"></param>
+    public static void RecalculateTangents(this Mesh @this)
+    {
+        var vertices = @this.vertices;
+        var normals = @this.normals;
+        var texcoords = @this.uv;
+        var triangles = @this.triangles;
+
+        var vertexCount = @this.vertexCount;
+        var triangleCount = triangles.Length / 3;
+
+        var tangents = new Vector4[vertexCount];
+        var tan1 = new Vector3[vertexCount];
+        var tan2 = new Vector3[vertexCount];
+
+        var tri = 0;
+
+        for (var i = 0; i < triangleCount; i++)
+        {
+            var i1 = triangles[tri];
+            var i2 = triangles[tri + 1];
+            var i3 = triangles[tri + 2];
+
+            var v1 = vertices[i1];
+            var v2 = vertices[i2];
+            var v3 = vertices[i3];
+
+            var w1 = texcoords[i1];
+            var w2 = texcoords[i2];
+            var w3 = texcoords[i3];
+
+            var x1 = v2.x - v1.x;
+            var x2 = v3.x - v1.x;
+            var y1 = v2.y - v1.y;
+            var y2 = v3.y - v1.y;
+            var z1 = v2.z - v1.z;
+            var z2 = v3.z - v1.z;
+
+            var s1 = w2.x - w1.x;
+            var s2 = w3.x - w1.x;
+            var t1 = w2.y - w1.y;
+            var t2 = w3.y - w1.y;
+
+            var r = 1.0f / (s1 * t2 - s2 * t1);
+            var sdir = new Vector3(
+                (t2 * x1 - t1 * x2) * r,
+                (t2 * y1 - t1 * y2) * r,
+                (t2 * z1 - t1 * z2) * r);
+            var tdir = new Vector3(
+                (s1 * x2 - s2 * x1) * r,
+                (s1 * y2 - s2 * y1) * r,
+                (s1 * z2 - s2 * z1) * r);
+
+            tan1[i1] += sdir;
+            tan1[i2] += sdir;
+            tan1[i3] += sdir;
+
+            tan2[i1] += tdir;
+            tan2[i2] += tdir;
+            tan2[i3] += tdir;
+
+            tri += 3;
+        }
+
+        for (int i = 0; i < vertexCount; i++)
+        {
+
+            var normal = normals[i];
+            var tangent = tan1[i];
+
+            // Gram-Schmidt orthogonalize
+            Vector3.OrthoNormalize(ref normal, ref tangent);
+
+            tangents[i].x = tangent.x;
+            tangents[i].y = tangent.y;
+            tangents[i].z = tangent.z;
+
+            // Calculate handedness
+            tangents[i].w = Vector3.Dot(Vector3.Cross(normal, tangent), tan2[i]) < 0.0f
+                ? -1.0f
+                : 1.0f;
+        }
+
+        @this.tangents = tangents;
     }
 
     /// <summary>

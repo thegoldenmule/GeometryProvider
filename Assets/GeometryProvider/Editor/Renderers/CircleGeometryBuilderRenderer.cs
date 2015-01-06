@@ -12,13 +12,11 @@ namespace TheGoldenMule.Geo.Editor
     public class CircleGeometryBuilderRenderer : StandardGeometryBuilderRenderer
     {
         /// <summary>
-        /// Appends custom circle controls after transform controls.
+        /// Draws custom controls for Circle.
         /// </summary>
         /// <param name="settings"></param>
-        protected override void DrawTransformControls(GeometryBuilderSettings settings)
+        protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
-            base.DrawTransformControls(settings);
-
             var polygonSettings = (CircleGeometryBuilderSettings) settings;
 
             GUILayout.Label("Circle");

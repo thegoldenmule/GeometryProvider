@@ -9,7 +9,8 @@ namespace TheGoldenMule.Geo.Editor
     {
         public event Action OnCreate;
         public event Action OnUpdate;
-        
+
+        protected bool _bufferFoldout = false;
         protected string _buildTabState;
         
         public virtual bool IsLiveUpdate
@@ -34,7 +35,34 @@ namespace TheGoldenMule.Geo.Editor
             GUILayout.BeginVertical();
 
             DrawIntro(settings);
+            EditorGUILayout.Separator();
+
             DrawTransformControls(settings);
+            EditorGUILayout.Separator();
+
+            _bufferFoldout = EditorGUILayout.Foldout(_bufferFoldout, "Buffers");
+
+            if (_bufferFoldout)
+            {
+                DrawUVControls(settings, settings.UV);
+                EditorGUILayout.Separator();
+
+                DrawUVControls(settings, settings.UV2);
+                EditorGUILayout.Separator();
+
+                DrawColorControls(settings);
+                EditorGUILayout.Separator();
+
+                DrawNormalControls(settings);
+                EditorGUILayout.Separator();
+
+                DrawTangentControls(settings);
+                EditorGUILayout.Separator();
+            }
+
+            DrawCustomControls(settings);
+            EditorGUILayout.Separator();
+
             DrawBuildControls(settings);
 
             GUILayout.EndVertical();
@@ -42,8 +70,6 @@ namespace TheGoldenMule.Geo.Editor
 
         protected virtual void DrawIntro(GeometryBuilderSettings settings)
         {
-            GUILayout.Label(settings.Name ?? "");
-
             EditorGUI.indentLevel++;
             GUILayout.TextArea(settings.Description ?? "");
             EditorGUI.indentLevel--;
@@ -51,14 +77,72 @@ namespace TheGoldenMule.Geo.Editor
 
         protected virtual void DrawTransformControls(GeometryBuilderSettings settings)
         {
-            GUILayout.Label("Transform");
+            GUILayout.Label("Transform Vertices");
 
             EditorGUI.indentLevel++;
-            settings.Transform.Translation = EditorGUILayout.Vector3Field("Translation", settings.Transform.Translation);
-            settings.Transform.Rotation.eulerAngles = EditorGUILayout.Vector3Field("Rotation", settings.Transform.Rotation.eulerAngles);
-            settings.Transform.Scale = EditorGUILayout.Vector3Field("Scale", settings.Transform.Scale);
-            settings.Transform.CustomDeformation = (Material) EditorGUILayout.ObjectField("Material", settings.Transform.CustomDeformation, typeof(Material), false);
+            settings.Vertex.Translation = EditorGUILayout.Vector3Field("Translation", settings.Vertex.Translation);
+            settings.Vertex.Rotation.eulerAngles = EditorGUILayout.Vector3Field("Rotation", settings.Vertex.Rotation.eulerAngles);
+            settings.Vertex.Scale = EditorGUILayout.Vector3Field("Scale", settings.Vertex.Scale);
             EditorGUI.indentLevel--;
+        }
+
+        protected virtual void DrawBufferControls(GeometryBuilderBufferSettings bufferSettings)
+        {
+            bufferSettings.Buffer = (Buffer) EditorGUILayout.EnumPopup("Buffer", bufferSettings.Buffer);
+            bufferSettings.Enabled = EditorGUILayout.Toggle("Enabled", bufferSettings.Enabled);
+        }
+
+        protected virtual void DrawUVControls(GeometryBuilderSettings settings, GeometryBuilderUVSettings uv)
+        {
+            GUILayout.Label("UV");
+
+            EditorGUI.indentLevel++;
+
+            DrawBufferControls(uv);
+            uv.Rect = EditorGUILayout.RectField("Rect", uv.Rect);
+
+            EditorGUI.indentLevel--;
+        }
+
+        protected virtual void DrawColorControls(GeometryBuilderSettings settings)
+        {
+            GUILayout.Label("Color");
+
+            EditorGUI.indentLevel++;
+
+            DrawBufferControls(settings.Color);
+            settings.Color.Tint = EditorGUILayout.ColorField("Color", settings.Color.Tint);
+
+            EditorGUI.indentLevel--;
+        }
+
+        protected virtual void DrawNormalControls(GeometryBuilderSettings settings)
+        {
+            GUILayout.Label("Normals");
+
+            EditorGUI.indentLevel++;
+
+            DrawBufferControls(settings.Normals);
+            settings.Normals.Generate = EditorGUILayout.Toggle("Generate", settings.Normals.Generate);
+            
+            EditorGUI.indentLevel--;
+        }
+
+        protected virtual void DrawTangentControls(GeometryBuilderSettings settings)
+        {
+            GUILayout.Label("Tangents");
+
+            EditorGUI.indentLevel++;
+
+            DrawBufferControls(settings.Tangents);
+            settings.Tangents.Generate = EditorGUILayout.Toggle("Generate", settings.Tangents.Generate);
+
+            EditorGUI.indentLevel--;
+        }
+
+        protected virtual void DrawCustomControls(GeometryBuilderSettings settings)
+        {
+            
         }
 
         protected virtual void DrawBuildControls(GeometryBuilderSettings settings)
@@ -76,7 +160,7 @@ namespace TheGoldenMule.Geo.Editor
         {
             EditorGUI.indentLevel++;
             
-            if (GUILayout.Button("Create New") && null != OnCreate)
+            if (GUILayout.Button("Create New", GUILayout.Height(40)) && null != OnCreate)
             {
                 OnCreate();
             }
