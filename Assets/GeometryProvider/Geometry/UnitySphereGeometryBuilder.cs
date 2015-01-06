@@ -16,7 +16,7 @@ namespace TheGoldenMule.Geo
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.hideFlags = HideFlags.HideAndDontSave;
 
-            var sphereMesh = sphere.GetComponent<MeshFilter>().mesh;
+            var sphereMesh = sphere.GetComponent<MeshFilter>().sharedMesh;
 
             var vertices = sphereMesh.vertices;
             var triangles = sphereMesh.triangles;
