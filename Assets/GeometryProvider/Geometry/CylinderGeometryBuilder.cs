@@ -3,10 +3,16 @@ using UnityEngine;
 
 namespace TheGoldenMule.Geo
 {
+    /// <summary>
+    /// Constructos geometry for a cylinder with a variable number of sides.
+    /// </summary>
     [DisplayName("Cylinder")]
     [Description("Builds a cylinder with the desired number of sides.")]
     public class CylinderGeometryBuilder : StandardGeometryBuilder
     {
+        /// <summary>
+        /// Builds mesh.
+        /// </summary>
         public override bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error)
         {
             error = string.Empty;
@@ -167,6 +173,10 @@ namespace TheGoldenMule.Geo
             numTriangles = numSides;
         }
 
+        /// <summary>
+        /// Custom factory for cylinder settings.
+        /// </summary>
+        /// <returns></returns>
         [CustomFactory(typeof(CylinderGeometryBuilder))]
         private static GeometryBuilderSettings Factory()
         {
