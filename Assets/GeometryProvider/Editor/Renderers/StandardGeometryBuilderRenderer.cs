@@ -24,6 +24,11 @@ namespace TheGoldenMule.Geo.Editor
             set;
         }
 
+        public StandardGeometryBuilderRenderer()
+        {
+            IsLiveUpdate = true;
+        }
+
         public virtual void Draw(GeometryBuilderSettings settings)
         {
             GUILayout.BeginVertical();

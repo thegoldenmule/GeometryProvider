@@ -8,11 +8,11 @@ namespace TheGoldenMule.Geo
     /// <summary>
     /// Settings for generating a convex or star polygon.
     /// </summary>
-    public class PolygonGeometryBuilderSettings : GeometryBuilderSettings
+    public class CircleGeometryBuilderSettings : GeometryBuilderSettings
     {
         /// <summary>
         /// The number of sides.
         /// </summary>
-        public int NumSides = 3;
+        public int NumSides = 10;
     }
 }
