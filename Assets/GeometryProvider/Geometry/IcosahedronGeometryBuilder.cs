@@ -57,18 +57,14 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Builds an icosahedron.
         /// </summary>
-        public override bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error)
+        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
-            error = string.Empty;
-
             var verts = Vertices;
             var triangles = Indices;
 
             Transform(ref verts, settings);
 
             mesh.Apply(ref verts, ref triangles);
-
-            return true;
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using UnityEngine;
 
@@ -12,13 +8,10 @@ namespace TheGoldenMule.Geo
     [Description("Builds a plane in XZ space.")]
     public class PlaneGeometryBuilder : StandardGeometryBuilder
     {
-        public override bool Build(
+        public override void Build(
             Mesh mesh,
-            GeometryBuilderSettings settings,
-            out string error)
+            GeometryBuilderSettings settings)
         {
-            error = string.Empty;
-
             var planeSettings = (PlaneGeometryBuilderSettings) settings;
 
             BuildCompactPlane(mesh, planeSettings);
@@ -27,8 +20,6 @@ namespace TheGoldenMule.Geo
             {
                 UnshareVerts(mesh);
             }
-
-            return true;
         }
 
         private static void BuildCompactPlane(Mesh mesh, PlaneGeometryBuilderSettings settings)

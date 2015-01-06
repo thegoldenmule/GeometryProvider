@@ -13,10 +13,8 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Builds mesh.
         /// </summary>
-        public override bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error)
+        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
-            error = string.Empty;
-
             var cylinderSettings = (CylinderGeometryBuilderSettings) settings;
             
             var numSides = Mathf.Max(3, cylinderSettings.NumSides);
@@ -157,8 +155,6 @@ namespace TheGoldenMule.Geo
             // remaining transformation + application
             Transform(ref vertices, settings);
             mesh.Apply(ref vertices, ref triangles);
-            
-            return true;
         }
 
         /// <summary>

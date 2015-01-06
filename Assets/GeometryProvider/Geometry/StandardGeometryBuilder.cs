@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TheGoldenMule.Geo
 {
@@ -14,13 +9,9 @@ namespace TheGoldenMule.Geo
             // 
         }
 
-        public virtual bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error)
+        public virtual void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
-            error = string.Empty;
-
-            // noop
-
-            return true;
+            
         }
 
         protected virtual void UnshareVerts(Mesh mesh)

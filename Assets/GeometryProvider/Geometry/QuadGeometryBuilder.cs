@@ -13,17 +13,10 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Builds geo for a quad.
         /// </summary>
-        /// <param name="mesh"></param>
-        /// <param name="settings"></param>
-        /// <param name="error"></param>
-        /// <returns></returns>
-        public override bool Build(
+        public override void Build(
             Mesh mesh,
-            GeometryBuilderSettings settings,
-            out string error)
+            GeometryBuilderSettings settings)
         {
-            error = string.Empty;
-
             var vertices = new []
             {
                 new Vector3(-0.5f, 0f, -0.5f),
@@ -40,8 +33,6 @@ namespace TheGoldenMule.Geo
             Transform(ref vertices, settings);
 
             mesh.Apply(ref vertices, ref indices);
-
-            return true;
         }
 
         /// <summary>

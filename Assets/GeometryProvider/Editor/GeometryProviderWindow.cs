@@ -90,11 +90,7 @@ namespace TheGoldenMule.Geo.Editor
                 return;
             }
 
-            string error;
-            if (!_builder.Build(_mesh, _settings, out error))
-            {
-                Debug.LogError(string.Format("Could not build mesh : {0}.", error));
-            }
+            _builder.Build(_mesh, _settings);
         }
 
         private void InitializeBuilders()

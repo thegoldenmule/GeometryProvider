@@ -13,10 +13,8 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Builds a pyramid.
         /// </summary>
-        public override bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error)
+        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
-            error = string.Empty;
-
             var pyramidSettings = (PyramidGeometryBuilderSettings) settings;
 
             var numSides = pyramidSettings.NumSides;
@@ -56,8 +54,6 @@ namespace TheGoldenMule.Geo
 
             Transform(ref vertices, settings);
             mesh.Apply(ref vertices, ref triangles);
-
-            return true;
         }
 
         /// <summary>

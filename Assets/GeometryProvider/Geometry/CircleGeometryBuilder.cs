@@ -18,10 +18,8 @@ namespace TheGoldenMule.Geo
         /// <param name="settings"></param>
         /// <param name="error"></param>
         /// <returns></returns>
-        public override bool Build(Mesh mesh, GeometryBuilderSettings settings, out string error)
+        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
-            error = string.Empty;
-
             var polygonSettings = (CircleGeometryBuilderSettings) settings;
 
             var numSides = Mathf.Max(3, polygonSettings.NumSides);
@@ -41,8 +39,6 @@ namespace TheGoldenMule.Geo
             Transform(ref vertices, settings);
 
             mesh.Apply(ref vertices, ref triangles);
-
-            return true;
         }
 
         /// <summary>
