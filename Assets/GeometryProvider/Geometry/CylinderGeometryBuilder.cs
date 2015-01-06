@@ -12,39 +12,159 @@ namespace TheGoldenMule.Geo
             error = string.Empty;
 
             var cylinderSettings = (CylinderGeometryBuilderSettings) settings;
-            /*
+            
             var numSides = Mathf.Max(3, cylinderSettings.NumSides);
 
-            // calculate buffer lengths by using circle builder
+            // calculate buffer lengths
             int numVerts, numTriangles;
-            CircleGeometryBuilder.CalculateBufferLength(
-                numSides,
-                out numVerts,
-                out numTriangles);
+            CalculateBufferLength(numSides, out numVerts, out numTriangles);
 
             // top and bottom of cylinder, so multiply by two
-            numVerts *= 2;
-            numTriangles *= 2;
+            int numTotalVerts = 2 * numVerts;
+            int numTotalTriangles = 2 * numTriangles;
 
             // the user may not want the ends filled in
             if (!cylinderSettings.Endcaps)
             {
-                numTriangles = 0;
+                numTotalTriangles = 0;
             }
 
             // a quad for each side
-            numTriangles += 2 * numSides;
+            numTotalTriangles += 2 * numSides;
 
-            var vertices = new Vector3[numVerts];
-            var triangles = new int[numTriangles * 3];
+            var vertices = new Vector3[numTotalVerts];
+            var triangles = new int[numTotalTriangles * 3];
+
+            var halfHeight = cylinderSettings.Height / 2f;
 
             // bottom
-            
+            {
+                vertices[0] = new Vector3(0f, -halfHeight, 0f);
 
+                var radians = 2f * Mathf.PI / numSides;
+                for (var i = 1; i < numVerts; i++)
+                {
+                    vertices[i] = new Vector3(
+                        0.5f * Mathf.Cos(radians * (i - 1)),
+                        -halfHeight,
+                        0.5f * Mathf.Sin(radians * (i - 1)));
+                }
+
+                if (cylinderSettings.Endcaps)
+                {
+                    for (var i = 0; i < numTriangles * 3; i += 3)
+                    {
+                        var vertIndex = i / 3 + 1;
+
+                        triangles[i] = vertIndex;
+                        triangles[i + 2] = 0;
+
+                        vertIndex = vertIndex + 1;
+                        if (vertIndex >= numVerts)
+                        {
+                            vertIndex = 1;
+                        }
+
+                        triangles[i + 1] = vertIndex;
+                    }
+                }
+            }
+
+            // top
+            {
+                var startVertIndex = numVerts;
+
+                vertices[startVertIndex] = new Vector3(0f, halfHeight, 0f);
+
+                var radians = 2f * Mathf.PI / numSides;
+                for (var i = 1; i < numVerts; i++)
+                {
+                    vertices[startVertIndex + i] = new Vector3(
+                        0.5f * Mathf.Cos(radians * (i - 1)),
+                        halfHeight,
+                        0.5f * Mathf.Sin(radians * (i - 1)));
+                }
+
+                if (cylinderSettings.Endcaps)
+                {
+                    var startTriangleIndex = numTriangles * 3;
+                    for (var i = 0; i < numTriangles * 3; i += 3)
+                    {
+                        var vertIndex = startVertIndex + i / 3 + 1;
+
+                        triangles[startTriangleIndex + i] = vertIndex;
+                        triangles[startTriangleIndex + i + 1] = startVertIndex;
+
+                        vertIndex = vertIndex + 1;
+                        if (vertIndex >= startVertIndex + numVerts)
+                        {
+                            vertIndex = startVertIndex + 1;
+                        }
+
+                        triangles[startTriangleIndex + i + 2] = vertIndex;
+                    }
+                }
+            }
+
+            // quads about the edges
+            {
+                var bottomVertStart = 1;
+                var topVertStart = numVerts + 1;
+
+                var bottomVertEnd = numVerts - 1;
+                var topVertEnd = 2 * numVerts - 1;
+
+                var startTriangleIndex = cylinderSettings.Endcaps
+                    ? 2 * numTriangles * 3
+                    : 0;
+
+                for (int quad = 0, len = numSides; quad < len; quad++)
+                {
+                    // get 4 corners
+                    var topVertIndex = topVertStart + quad;
+                    var bottomVertIndex = bottomVertStart + quad;
+
+                    var topVertNextIndex = topVertIndex + 1;
+                    if (topVertNextIndex > topVertEnd)
+                    {
+                        topVertNextIndex = topVertStart;
+                    }
+
+                    var bottomVertNextIndex = bottomVertIndex + 1;
+                    if (bottomVertNextIndex > bottomVertEnd)
+                    {
+                        bottomVertNextIndex = bottomVertStart;
+                    }
+
+                    var triangleIndex = startTriangleIndex + 6 * quad;
+
+                    triangles[triangleIndex] = topVertIndex;
+                    triangles[triangleIndex + 1] = bottomVertNextIndex;
+                    triangles[triangleIndex + 2] = bottomVertIndex;
+
+                    triangles[triangleIndex + 3] = topVertIndex;
+                    triangles[triangleIndex + 4] = topVertNextIndex;
+                    triangles[triangleIndex + 5] = bottomVertNextIndex;
+                }
+            }
+
+            // remaining transformation + application
             Transform(ref vertices, settings);
             mesh.Apply(ref vertices, ref triangles);
-            */
+            
             return true;
+        }
+
+        /// <summary>
+        /// Calculates the number of verts and triangles needed.
+        /// </summary>
+        private static void CalculateBufferLength(
+            int numSides,
+            out int numVerts,
+            out int numTriangles)
+        {
+            numVerts = numSides + 1;
+            numTriangles = numSides;
         }
 
         [CustomFactory(typeof(CylinderGeometryBuilder))]

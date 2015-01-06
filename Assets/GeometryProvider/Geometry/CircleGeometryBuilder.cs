@@ -48,9 +48,6 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Calculates the number of verts and triangles needed.
         /// </summary>
-        /// <param name="numSides"></param>
-        /// <param name="numVerts"></param>
-        /// <param name="numTriangles"></param>
         private static void CalculateBufferLength(
             int numSides,
             out int numVerts,
