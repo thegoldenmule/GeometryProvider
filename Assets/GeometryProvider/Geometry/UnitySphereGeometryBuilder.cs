@@ -14,6 +14,8 @@ namespace TheGoldenMule.Geo
         public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.hideFlags = HideFlags.HideAndDontSave;
+
             var sphereMesh = sphere.GetComponent<MeshFilter>().mesh;
 
             var vertices = sphereMesh.vertices;

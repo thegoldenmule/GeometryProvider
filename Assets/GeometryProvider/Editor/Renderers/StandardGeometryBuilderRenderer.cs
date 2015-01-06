@@ -106,5 +106,13 @@ namespace TheGoldenMule.Geo.Editor
         {
 
         }
+
+        protected void CallUpdate()
+        {
+            if (null != OnUpdate)
+            {
+                OnUpdate();
+            }
+        }
     }
 }

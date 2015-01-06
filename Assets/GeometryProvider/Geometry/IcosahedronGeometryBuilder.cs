@@ -11,7 +11,7 @@ namespace TheGoldenMule.Geo
     [Description("Builds a regular polyhedron with 20 faces.")]
     public class IcosahedronGeometryBuilder : StandardGeometryBuilder
     {
-        public static readonly int[] Indices =
+        public static readonly int[] Triangles =
 		{
 			1,4,0,
 			4,9,0,
@@ -60,7 +60,7 @@ namespace TheGoldenMule.Geo
         public override void Build(Mesh mesh, GeometryBuilderSettings settings)
         {
             var verts = Vertices;
-            var triangles = Indices;
+            var triangles = Triangles;
 
             Transform(ref verts, settings);
 
