@@ -50,8 +50,8 @@ namespace TheGoldenMule.Geo.Editor
 
             EditorGUI.indentLevel++;
             settings.Transform.Translation = EditorGUILayout.Vector3Field("Translation", settings.Transform.Translation);
-            settings.Transform.Scale = EditorGUILayout.Vector3Field("Scale", settings.Transform.Scale);
             settings.Transform.Rotation.eulerAngles = EditorGUILayout.Vector3Field("Rotation", settings.Transform.Rotation.eulerAngles);
+            settings.Transform.Scale = EditorGUILayout.Vector3Field("Scale", settings.Transform.Scale);
             settings.Transform.CustomDeformation = (Material) EditorGUILayout.ObjectField("Material", settings.Transform.CustomDeformation, typeof(Material), false);
             EditorGUI.indentLevel--;
         }

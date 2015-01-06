@@ -24,34 +24,55 @@ namespace TheGoldenMule.Geo
             var numIndices = numTriangles * 3;
 
             var vertices = new Vector3[numVerts];
-            var indices = new int[numIndices];
+            var triangles = new int[numIndices];
 
-            vertices[0] = Vector3.zero;
-
-            var radians = 2f * Mathf.PI / numSides;
-            for (var i = 1; i < numVerts; i++)
-            {
-                vertices[i] = 0.5f * new Vector3(
-                    Mathf.Cos(radians * (i - 1)),
-                    0f,
-                    Mathf.Sin(radians * (i - 1)));
-            }
-
-            for (var i = 0; i < numTriangles; i++)
-            {
-                var triangleIndex = i * 3;
-                var vertIndex = i + 1;
-
-                indices[triangleIndex] = vertIndex;
-                indices[triangleIndex + 1] = 0;
-                indices[triangleIndex + 2] = Mathf.Max(1, (vertIndex + 1) % numVerts);
-            }
+            BuildPolygon(
+                numSides,
+                true,
+                0, 0,
+                ref vertices,
+                ref triangles);
 
             Transform(ref vertices, settings);
 
-            mesh.Apply(ref vertices, ref indices);
+            mesh.Apply(ref vertices, ref triangles);
 
             return true;
+        }
+
+        public static void BuildPolygon(
+            int numSides,
+            bool fill,
+            int startVertexIndex,
+            int startTriangleIndex,
+            ref Vector3[] vertices,
+            ref int[] triangles)
+        {
+            var numVerts = numSides + 1;
+            vertices[startVertexIndex] = Vector3.zero;
+
+            var radians = 2f * Mathf.PI / numSides;
+            for (var i = startVertexIndex + 1; i < startVertexIndex + numVerts; i++)
+            {
+                vertices[i] = 0.5f * new Vector3(
+                    Mathf.Cos(radians * (i - startVertexIndex - 1)),
+                    0f,
+                    Mathf.Sin(radians * (i - startVertexIndex - 1)));
+            }
+
+            if (fill)
+            {
+                var numTriangles = numSides;
+                for (var i = startTriangleIndex; i < startTriangleIndex + numTriangles; i++)
+                {
+                    var triangleIndex = (i - startTriangleIndex) * 3;
+                    var vertIndex = (i - startTriangleIndex) + 1;
+
+                    triangles[triangleIndex] = vertIndex;
+                    triangles[triangleIndex + 1] = startVertexIndex;
+                    triangles[triangleIndex + 2] = Mathf.Max(1, (vertIndex + 1) % numVerts);
+                }
+            }
         }
 
         [CustomFactory(typeof(PolygonGeometryBuilder))]
