@@ -75,7 +75,8 @@ namespace TheGoldenMule.Geo
                 TransformWithRotation(ref uvs);
 
                 var uvObject = (object) uvs;
-                mesh.SetBuffer(Buffer, ref uvObject);
+                mesh.uv = uvs;
+                //mesh.SetBuffer(Buffer, ref uvObject);
             }
         }
 

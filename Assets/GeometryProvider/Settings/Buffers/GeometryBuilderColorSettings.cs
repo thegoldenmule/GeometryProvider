@@ -31,6 +31,11 @@ namespace TheGoldenMule.Geo
                 var colorObj = (object) colors;
                 mesh.SetBuffer(Buffer, ref colorObj);
             }
+            else
+            {
+                object nullObj = null;
+                mesh.SetBuffer(Buffer, ref nullObj);
+            }
         }
     }
 }

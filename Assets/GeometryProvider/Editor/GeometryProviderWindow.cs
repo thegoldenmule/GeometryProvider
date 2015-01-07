@@ -71,9 +71,13 @@ namespace TheGoldenMule.Geo.Editor
         {
             _gameObject = CreateGameObject("Primitive");
             _mesh = new Mesh();
-            _mesh.Clear();
 
+            Debug.Log(_mesh.colors.Length);
+            
             _gameObject.GetComponent<MeshFilter>().sharedMesh = _mesh;
+            _mesh = _gameObject.GetComponent<MeshFilter>().sharedMesh;
+
+            Debug.Log(_mesh.colors.Length);
 
             // select the new primitive
             EditorUtility.SelectAndFocus(_gameObject.transform);
@@ -82,7 +86,11 @@ namespace TheGoldenMule.Geo.Editor
                 _renderer.Selected = _gameObject.transform;
             }
 
+            Debug.Log(_mesh.colors.Length);
+
             OnUpdatePrimitive();
+
+            Debug.Log(_mesh.colors.Length);
         }
 
         private void OnUpdatePrimitive()

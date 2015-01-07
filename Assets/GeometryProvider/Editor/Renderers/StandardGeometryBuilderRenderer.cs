@@ -159,7 +159,13 @@ namespace TheGoldenMule.Geo.Editor
                 EditorGUI.indentLevel++;
 
                 DrawBufferControls(uv);
+
                 uv.Rect = EditorGUILayout.RectField("Rect", uv.Rect);
+
+                EditorGUILayout.BeginHorizontal();
+                uv.Rotation.Origin = EditorGUILayout.Vector2Field("Origin", uv.Rotation.Origin);
+                uv.Rotation.Theta = EditorGUILayout.FloatField("Theta", uv.Rotation.Theta);
+                EditorGUILayout.EndHorizontal();
 
                 EditorGUI.indentLevel--;
             }
@@ -230,8 +236,6 @@ namespace TheGoldenMule.Geo.Editor
                     new Tab("Update", DrawBuildUpdate),
                     new Tab("Save", DrawBuildSave));
             }
-
-            EditorGUILayout.Separator();
         }
 
         /// <summary>
@@ -256,7 +260,11 @@ namespace TheGoldenMule.Geo.Editor
         {
             EditorGUI.indentLevel++;
 
-            Selected = (Transform) EditorGUILayout.ObjectField("Primitive", Selected, typeof (Transform));
+            Selected = (Transform) EditorGUILayout.ObjectField(
+                "Primitive",
+                Selected,
+                typeof (Transform),
+                true);
 
             if (null != OnUpdate)
             {
