@@ -10,6 +10,7 @@ namespace TheGoldenMule.Geo.Editor
         public event Action OnCreate;
         public event Action OnUpdate;
 
+        protected Vector2 _scrollPosition;
         protected bool _bufferFoldout = false;
         protected string _buildTabState;
         
@@ -33,6 +34,8 @@ namespace TheGoldenMule.Geo.Editor
         public virtual void Draw(GeometryBuilderSettings settings)
         {
             GUILayout.BeginVertical();
+
+            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
 
             DrawIntro(settings);
             EditorGUILayout.Separator();
@@ -64,6 +67,8 @@ namespace TheGoldenMule.Geo.Editor
             EditorGUILayout.Separator();
 
             DrawBuildControls(settings);
+
+            GUILayout.EndScrollView();
 
             GUILayout.EndVertical();
         }
