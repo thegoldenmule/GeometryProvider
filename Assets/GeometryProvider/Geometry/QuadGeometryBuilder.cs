@@ -31,7 +31,7 @@ namespace TheGoldenMule.Geo
                 0, 3, 2
             };
 
-            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
 
             ApplyAllDefaults(mesh, settings);
         }

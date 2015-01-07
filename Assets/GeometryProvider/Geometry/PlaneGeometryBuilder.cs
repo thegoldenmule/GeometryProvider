@@ -27,6 +27,7 @@ namespace TheGoldenMule.Geo
             var numIndices = numQuads * 6;
 
             var vertices = new Vector3[numVerts];
+            var uvs = new Vector2[numVerts];
             var triangles = new int[numIndices];
 
             var invXVerts = 1f / (xVerts - 1);
@@ -36,10 +37,15 @@ namespace TheGoldenMule.Geo
             {
                 for (int z = 0; z < zVerts; z++)
                 {
-                    vertices[x + z * xVerts] = new Vector3(
+                    int vertIndex = x + z * xVerts;
+                    
+                    vertices[vertIndex] = new Vector3(
                         x * invXVerts - 0.5f,
                         0,
                         z * invZVerts - 0.5f);
+                    uvs[vertIndex] = new Vector2(
+                        x * invXVerts,
+                        z * invZVerts);
                 }
             }
 
@@ -60,9 +66,14 @@ namespace TheGoldenMule.Geo
                 }
             }
 
-            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+            // triangles + verts have to come first
+            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
 
+            // now defaults
             ApplyAllDefaults(mesh, settings);
+
+            // now custom stuff
+            settings.UV.TransformAndApply(mesh, ref uvs);
         }
 
         [CustomFactory(typeof(PlaneGeometryBuilder))]

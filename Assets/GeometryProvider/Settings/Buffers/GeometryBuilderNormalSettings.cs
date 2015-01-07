@@ -9,7 +9,16 @@ namespace TheGoldenMule.Geo
     [Serializable]
     public class GeometryBuilderNormalSettings : GeometryBuilderBufferSettings
     {
+        /// <summary>
+        /// If true, generates normals.
+        /// </summary>
         public bool Generate = true;
+
+        /// <summary>
+        /// If true, flips normals. This is useful if you are *inside* a
+        /// primitive.
+        /// </summary>
+        public bool Invert = true;
 
         public GeometryBuilderNormalSettings()
         {

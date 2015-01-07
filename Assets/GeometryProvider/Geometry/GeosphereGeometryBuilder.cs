@@ -28,7 +28,7 @@ namespace TheGoldenMule.Geo
 
             Normalize(ref vertices);
 
-            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
 
             ApplyAllDefaults(mesh, settings);
         }

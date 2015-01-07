@@ -71,6 +71,7 @@ namespace TheGoldenMule.Geo.Editor
         {
             _gameObject = CreateGameObject("Primitive");
             _mesh = new Mesh();
+            _mesh.Clear();
 
             _gameObject.GetComponent<MeshFilter>().sharedMesh = _mesh;
 

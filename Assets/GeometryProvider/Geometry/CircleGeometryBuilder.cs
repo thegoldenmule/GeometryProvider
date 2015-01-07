@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using System.Security.Cryptography;
+
 using UnityEngine;
 
 namespace TheGoldenMule.Geo
@@ -32,7 +32,7 @@ namespace TheGoldenMule.Geo
                 ref vertices,
                 ref triangles);
 
-            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
 
             ApplyAllDefaults(mesh, settings);
         }
@@ -40,7 +40,7 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Calculates the number of verts and triangles needed.
         /// </summary>
-        private static void CalculateBufferLength(
+        public static void CalculateBufferLength(
             int numSides,
             out int numVerts,
             out int numTriangles)
@@ -52,7 +52,7 @@ namespace TheGoldenMule.Geo
         /// <summary>
         /// Actually builds the vertex and index buffers.
         /// </summary>
-        private static void BuildCircle(
+        public static void BuildCircle(
             int numSides,
             ref Vector3[] vertices,
             ref int[] triangles)

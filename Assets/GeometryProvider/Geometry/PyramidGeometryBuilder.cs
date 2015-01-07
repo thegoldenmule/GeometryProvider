@@ -52,7 +52,7 @@ namespace TheGoldenMule.Geo
                 triangles[triangleIndex + 2] = index;
             }
 
-            settings.Vertex.ApplyDefault(mesh, ref vertices, ref triangles);
+            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
 
             ApplyAllDefaults(mesh, settings);
         }
