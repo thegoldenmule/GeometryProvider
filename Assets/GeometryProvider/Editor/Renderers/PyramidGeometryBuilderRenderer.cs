@@ -14,15 +14,12 @@ namespace TheGoldenMule.Geo.Editor
         /// </summary>
         protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
-            var pyramid = (PyramidGeometryBuilderSettings) settings;
+            base.DrawCustomControls(settings);
 
-            GUILayout.Label("Pyramid");
-            EditorGUI.indentLevel++;
+            var pyramid = (PyramidGeometryBuilderSettings) settings;
 
             pyramid.NumSides = Mathf.Max(3, EditorGUILayout.IntField("Number of Sides", pyramid.NumSides));
             pyramid.Height = EditorGUILayout.FloatField("Height", pyramid.Height);
-
-            EditorGUI.indentLevel--;
         }
     }
 }

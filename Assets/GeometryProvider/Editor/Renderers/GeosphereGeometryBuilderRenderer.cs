@@ -15,10 +15,9 @@ namespace TheGoldenMule.Geo.Editor
         /// <param name="settings"></param>
         protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
+            base.DrawCustomControls(settings);
+            
             var geosphereSettings = (GeosphereGeometryBuilderSettings) settings;
-
-            GUILayout.Label("Geosphere");
-            EditorGUI.indentLevel++;
 
             geosphereSettings.Quality = Mathf.Max(
                 1,
@@ -26,10 +25,12 @@ namespace TheGoldenMule.Geo.Editor
                     "Quality",
                     geosphereSettings.Quality,
                     0, 4));
-
-            EditorGUI.indentLevel--;
         }
 
+        /// <summary>
+        /// Overrides Update panel because GeoSphere's are too expensive to be
+        /// built every frame using the subdivision method.
+        /// </summary>
         protected override void DrawBuildUpdate()
         {
             EditorGUI.indentLevel++;

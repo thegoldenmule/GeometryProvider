@@ -4,16 +4,32 @@ using System.Linq;
 
 namespace TheGoldenMule
 {
-    public static class TypeUtility
+    public static class TypeExtensions
     {
-        public static Type[] Implementors<T>()
+        public static Type[] Implementors(this Type @this)
         {
             return AppDomain
                 .CurrentDomain
                 .GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => typeof(T).IsAssignableFrom(type) && !type.IsInterface)
+                .Where(type => @this.IsAssignableFrom(type) && !type.IsInterface)
                 .ToArray();
+        }
+
+        public static T Attribute<T>(this Type @this) where T : Attribute
+        {
+            return @this
+                .GetCustomAttributes(typeof(T), true)
+                .OfType<T>()
+                .FirstOrDefault<T>();
+        }
+
+        public static T Attribute<T>(this MethodInfo @this) where T : Attribute
+        {
+            return @this
+                .GetCustomAttributes(typeof(T), true)
+                .OfType<T>()
+                .FirstOrDefault<T>();
         }
 
         public static MethodInfo[] MethodsWithAttribute<T>() where T : Attribute
@@ -27,22 +43,6 @@ namespace TheGoldenMule
                     .GetCustomAttributes(typeof(T), true)
                     .Any())
                 .ToArray();
-        }
-
-        public static T Attribute<T>(Type type) where T : Attribute
-        {
-            return type
-                .GetCustomAttributes(typeof(T), true)
-                .OfType<T>()
-                .FirstOrDefault<T>();
-        }
-
-        public static T Attribute<T>(MethodInfo method) where T : Attribute
-        {
-            return method
-                .GetCustomAttributes(typeof(T), true)
-                .OfType<T>()
-                .FirstOrDefault<T>();
         }
     }
 }

@@ -51,8 +51,15 @@ namespace TheGoldenMule.Geo.Editor
             DrawIntro(settings);
             EditorGUILayout.Separator();
 
-            DrawCustomControls(settings);
-            EditorGUILayout.Separator();
+            if (Foldout("Primitive"))
+            {
+                EditorGUI.indentLevel++;
+
+                DrawCustomControls(settings);
+                EditorGUILayout.Separator();
+
+                EditorGUI.indentLevel++;
+            }
 
             DrawTestControls(settings);
             EditorGUILayout.Separator();
@@ -108,7 +115,7 @@ namespace TheGoldenMule.Geo.Editor
         /// <param name="settings"></param>
         protected virtual void DrawCustomControls(GeometryBuilderSettings settings)
         {
-
+            
         }
 
         /// <summary>

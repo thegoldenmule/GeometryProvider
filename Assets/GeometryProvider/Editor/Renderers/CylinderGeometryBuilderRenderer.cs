@@ -17,14 +17,11 @@ namespace TheGoldenMule.Geo.Editor
         {
             var cylinderSettings = (CylinderGeometryBuilderSettings) settings;
 
-            GUILayout.Label("Cylinder");
-            EditorGUI.indentLevel++;
+            base.DrawCustomControls(settings);
 
             cylinderSettings.NumSides = Mathf.Max(3, EditorGUILayout.IntField("Number of Sides", cylinderSettings.NumSides));
             cylinderSettings.Height = EditorGUILayout.FloatField("Height", cylinderSettings.Height);
             cylinderSettings.Endcaps = EditorGUILayout.Toggle("Cap Ends", cylinderSettings.Endcaps);
-
-            EditorGUI.indentLevel--;
         }
     }
 }

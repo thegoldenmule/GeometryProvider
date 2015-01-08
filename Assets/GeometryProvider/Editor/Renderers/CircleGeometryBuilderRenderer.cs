@@ -1,6 +1,4 @@
-﻿using System;
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace TheGoldenMule.Geo.Editor
@@ -17,13 +15,11 @@ namespace TheGoldenMule.Geo.Editor
         /// <param name="settings"></param>
         protected override void DrawCustomControls(GeometryBuilderSettings settings)
         {
+            base.DrawCustomControls(settings);
+
             var polygonSettings = (CircleGeometryBuilderSettings) settings;
 
-            GUILayout.Label("Circle");
-
-            EditorGUI.indentLevel++;
             polygonSettings.NumSides = Mathf.Max(3, EditorGUILayout.IntField("Number of Sides", polygonSettings.NumSides));
-            EditorGUI.indentLevel--;
         }
     }
 }
