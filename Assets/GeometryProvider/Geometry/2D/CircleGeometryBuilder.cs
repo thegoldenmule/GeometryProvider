@@ -96,7 +96,7 @@ namespace TheGoldenMule.Geo
                 var cosine = Mathf.Cos(radians * (i - 1));
                 var sine = Mathf.Sin(radians * (i - 1));
 
-                uvs[i] = Vector2.one + 0.5f * new Vector2(cosine, sine);
+                uvs[i] = 0.5f * (Vector2.one + new Vector2(cosine, sine));
             }
         }
 
