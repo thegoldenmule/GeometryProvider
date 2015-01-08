@@ -1,8 +1,11 @@
-﻿namespace TheGoldenMule.Geo
+﻿using System;
+
+namespace TheGoldenMule.Geo
 {
     /// <summary>
     /// Settings for generating a convex or star polygon.
     /// </summary>
+    [Serializable]
     public class CircleGeometryBuilderSettings : GeometryBuilderSettings
     {
         /// <summary>

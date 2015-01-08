@@ -7,105 +7,88 @@ namespace TheGoldenMule.Geo
     /// Builds a pyramid.
     /// </summary>
     [DisplayName("Pyramid")]
-    [Description("Builds a pyramid with a single point at the top.")]
-    public class PyramidGeometryBuilder : StandardGeometryBuilder
+    [Description("Builds a pyramid. Defaults to a tetrahedron.")]
+    public class PyramidGeometryBuilder : CircleGeometryBuilder
     {
         /// <summary>
-        /// Builds a pyramid.
+        /// Settings for building a pyramid.
         /// </summary>
-        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
+        private PyramidGeometryBuilderSettings _settings;
+
+        /// <summary>
+        /// Number of sides on the pyramid.
+        /// </summary>
+        private int _numSides;
+
+        /// <summary>
+        /// Starts the build flow.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <param name="settings"></param>
+        public override void Start(Mesh mesh, GeometryBuilderSettings settings)
         {
-            var pyramidSettings = (PyramidGeometryBuilderSettings) settings;
+            _settings = (PyramidGeometryBuilderSettings) settings;
 
-            var numSides = pyramidSettings.NumSides;
+            _numSides = _settings.NumSides;
+            CalculateBufferLength(_settings.NumSides, out _numVertices, out _numTriangles);
 
-            int numVerts, numTriangles;
-            CalculateBufferLength(pyramidSettings.NumSides, out numVerts, out numTriangles);
+            _numVertices += 1;
+        }
 
-            var vertices = new Vector3[numVerts + 1];
-            var triangles = new int[(numTriangles + pyramidSettings.NumSides) * 3];
+        /// <summary>
+        /// Generates vertex and triangle layout.
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="triangles"></param>
+        public override void Layout(out Vector3[] vertices, out int[] triangles)
+        {
+            vertices = new Vector3[_numVertices];
+            triangles = new int[(_numTriangles + _numSides) * 3];
 
             BuildCircle(
-                numSides,
+                _numSides,
                 ref vertices,
                 ref triangles);
 
             // add last vert
-            vertices[numVerts] = new Vector3(0f, pyramidSettings.Height, 0f);
+            vertices[_numVertices - 1] = new Vector3(0f, _settings.Height, 0f);
 
             // construct triangles to new vert
-            var startTriangleIndex = numSides * 3;
-            for (int i = 0, len = numSides; i < len; i++)
+            var startTriangleIndex = _numSides * 3;
+            for (int i = 0, len = _numSides; i < len; i++)
             {
                 var triangleIndex = startTriangleIndex + i * 3;
                 var vertIndex = i + 1;
 
                 triangles[triangleIndex] = vertIndex;
-                triangles[triangleIndex + 1] = numVerts;
+                triangles[triangleIndex + 1] = _numVertices - 1;
 
                 var index = vertIndex + 1;
-                if (index >= numVerts)
+                if (index >= _numVertices - 1)
                 {
                     index = 1;
                 }
 
                 triangles[triangleIndex + 2] = index;
             }
-
-            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
-
-            ApplyAllDefaults(mesh, settings);
         }
 
         /// <summary>
-        /// Calculates the number of verts and triangles needed.
+        /// Generates UVs.
         /// </summary>
-        private static void CalculateBufferLength(
-            int numSides,
-            out int numVerts,
-            out int numTriangles)
+        /// <param name="uvs"></param>
+        /// <param name="settings"></param>
+        public override void UV(
+            out Vector2[] uvs,
+            GeometryBuilderUVSettings settings)
         {
-            numVerts = numSides + 1;
-            numTriangles = numSides;
-        }
+            uvs = new Vector2[_numVertices];
 
-        /// <summary>
-        /// Builds circle geo.
-        /// </summary>
-        private static void BuildCircle(
-            int numSides,
-            ref Vector3[] vertices,
-            ref int[] triangles)
-        {
-            int numVerts, numTriangles;
-            CalculateBufferLength(numSides, out numVerts, out numTriangles);
+            BuildCircleUVs(
+                _numSides,
+                ref uvs);
 
-            vertices[0] = Vector3.zero;
-
-            var radians = 2f * Mathf.PI / numSides;
-            for (var i = 1; i < numVerts; i++)
-            {
-                vertices[i] = 0.5f * new Vector3(
-                        Mathf.Cos(radians * (i - 1)),
-                        0f,
-                        Mathf.Sin(radians * (i - 1)));
-            }
-
-            for (var i = 0; i < numTriangles * 3; i += 3)
-            {
-                var vertIndex = i / 3 + 1;
-
-                triangles[i] = vertIndex;
-                triangles[i + 2] = 0;
-
-                vertIndex = vertIndex + 1;
-                if (vertIndex >= numVerts)
-                {
-                    vertIndex = 1;
-                }
-
-                triangles[i + 1] = vertIndex;
-            }
+            uvs[_numVertices - 1] = new Vector2(0.5f, 0.5f);
         }
 
         /// <summary>

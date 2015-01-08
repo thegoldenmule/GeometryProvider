@@ -2,25 +2,16 @@
 using UnityEditor;
 
 using System.Collections.Generic;
-using System.Reflection;
 using System;
+using System.ComponentModel;
 
 namespace TheGoldenMule.Geo.Editor
 {
 
     public class GeometryProviderWindow : EditorWindow
     {
-        private static readonly List<MethodInfo> _allFactories = new List<MethodInfo>();
-
-        static GeometryProviderWindow()
-        {
-            _allFactories.AddRange(TypeExtensions.MethodsWithAttribute<CustomFactory>());
-        }
-
         private readonly List<string> _builderNames = new List<string>();
-        private readonly List<IGeometryBuilder> _builders = new List<IGeometryBuilder>();
         private readonly List<IGeometryBuilderRenderer> _renderers = new List<IGeometryBuilderRenderer>();
-        private readonly List<MethodInfo> _factories = new List<MethodInfo>();
 
         private int _selectedBuilderIndex = -1;
         private GeometryBuilderSettings _settings;
@@ -31,10 +22,19 @@ namespace TheGoldenMule.Geo.Editor
 
         private void OnEnable()
         {
-            InitializeBuilders();
-
             minSize = new Vector2(168, 300);
             title = "Geo Editor";
+
+            foreach (var builder in GeometryProvider.Builders)
+            {
+                _builderNames.Add(Name(builder));
+
+                var renderer = Renderer(builder);
+                renderer.OnCreate += OnCreatePrimitive;
+                renderer.OnUpdate += OnUpdatePrimitive;
+                _renderers.Add(renderer);
+            }
+
         }
 
         private void OnGUI()
@@ -50,10 +50,10 @@ namespace TheGoldenMule.Geo.Editor
             {
                 if (index != _selectedBuilderIndex || null == _renderer)
                 {
-                    _settings = (GeometryBuilderSettings) _factories[index].Invoke(null, null);
+                    _settings = (GeometryBuilderSettings) GeometryProvider.Factories[index].Invoke(null, null);
 
                     _renderer = _renderers[index];
-                    _builder = _builders[index];
+                    _builder = GeometryProvider.Builders[index];
 
                     _settings.Name = Name(_builder);
                     _settings.Description = Description(_builder);
@@ -95,46 +95,7 @@ namespace TheGoldenMule.Geo.Editor
 
         private void OnUpdatePrimitive()
         {
-            if (null == _gameObject || null == _builder)
-            {
-                return;
-            }
-
-            _builder.Build(_mesh, _settings);
-        }
-
-        private void InitializeBuilders()
-        {
-            var builderTypes = typeof(IGeometryBuilder).Implementors();
-            
-            foreach (var builderType in builderTypes)
-            {
-                if (builderType.IsAbstract)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    var builder = (IGeometryBuilder) Activator.CreateInstance(builderType);
-                    var renderer = Renderer(builder);
-                    var factory = Factory(builder);
-
-                    renderer.OnCreate += OnCreatePrimitive;
-                    renderer.OnUpdate += OnUpdatePrimitive;
-
-                    _builderNames.Add(Name(builder));
-                    _builders.Add(builder);
-                    _renderers.Add(renderer);
-                    _factories.Add(factory);
-                }
-                catch
-                {
-                    Debug.LogError(string.Format(
-                        "Could not instantiate IGeometryBuilder {0}. Does it have a public default constructor?",
-                        builderType));
-                }
-            }
+            GeometryProvider.Build(_mesh, _builder, _settings);
         }
 
         private static GameObject CreateGameObject(string name)
@@ -151,7 +112,7 @@ namespace TheGoldenMule.Geo.Editor
         private static string Name(IGeometryBuilder builder)
         {
             var builderType = builder.GetType();
-            var customName = TypeExtensions.Attribute<System.ComponentModel.DisplayNameAttribute>(builderType);
+            var customName = builderType.Attribute<DisplayNameAttribute>();
             if (null != customName)
             {
                 return customName.DisplayName;
@@ -163,7 +124,7 @@ namespace TheGoldenMule.Geo.Editor
         private static string Description(IGeometryBuilder builder)
         {
             var builderType = builder.GetType();
-            var customName = TypeExtensions.Attribute<System.ComponentModel.DescriptionAttribute>(builderType);
+            var customName = builderType.Attribute<DescriptionAttribute>();
             if (null != customName)
             {
                 return customName.Description;
@@ -203,27 +164,6 @@ namespace TheGoldenMule.Geo.Editor
             }
 
             return new StandardGeometryBuilderRenderer();
-        }
-
-        private static MethodInfo Factory(IGeometryBuilder builder)
-        {
-            foreach (var method in _allFactories)
-            {
-                var attribute = method.Attribute<CustomFactory>();
-                if (null != attribute && attribute.Type == builder.GetType())
-                {
-                    return method;
-                }
-            }
-            
-            return typeof(GeometryProviderWindow).GetMethod(
-                "DefaultFactory",
-                BindingFlags.Static | BindingFlags.NonPublic);
-        }
-
-        private static GeometryBuilderSettings DefaultFactory()
-        {
-            return new GeometryBuilderSettings();
         }
 
         [MenuItem("GameObject/Geometry Editor %g")]

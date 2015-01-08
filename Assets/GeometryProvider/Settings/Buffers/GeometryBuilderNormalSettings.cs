@@ -7,36 +7,26 @@ namespace TheGoldenMule.Geo
     /// Holds normal data.
     /// </summary>
     [Serializable]
-    public class GeometryBuilderNormalSettings : GeometryBuilderBufferSettings
+    public class GeometryBuilderNormalSettings : GeometryBuilderBufferSettings<Vector3>
     {
-        /// <summary>
-        /// If true, generates normals.
-        /// </summary>
-        public bool Generate = true;
-
         /// <summary>
         /// If true, flips normals. This is useful if you are *inside* a
         /// primitive.
         /// </summary>
-        public bool Invert = true;
+        public bool Invert = false;
 
-        public GeometryBuilderNormalSettings()
+        /// <summary>
+        /// Transforms vectors.
+        /// </summary>
+        /// <param name="buffer"></param>
+        public override void Transform(ref Vector3[] buffer)
         {
-            Buffer = Buffer.Normal;
-        }
-
-        public override void ApplyDefault(Mesh mesh)
-        {
-            base.ApplyDefault(mesh);
-            
-            if (Enabled)
+            if (Invert)
             {
-                // TODO: this won't work if we chose a different buffer!
-                mesh.RecalculateNormals();
-            }
-            else
-            {
-                mesh.normals = null;
+                for (int i = 0, len = buffer.Length; i < len; i++)
+                {
+                    buffer[i] = -buffer[i];
+                }
             }
         }
     }

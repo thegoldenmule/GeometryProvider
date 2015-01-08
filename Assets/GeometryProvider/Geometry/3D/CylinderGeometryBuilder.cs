@@ -11,42 +11,73 @@ namespace TheGoldenMule.Geo
     public class CylinderGeometryBuilder : StandardGeometryBuilder
     {
         /// <summary>
+        /// Settings for cylinder.
+        /// </summary>
+        private CylinderGeometryBuilderSettings _settings;
+
+        /// <summary>
+        /// Number of verts in a circle.
+        /// </summary>
+        private int _numCircleVertices;
+
+        /// <summary>
+        /// Number of triangles in a circle.
+        /// </summary>
+        private int _numCircleTriangles;
+
+        /// <summary>
+        /// Number of sides in a circle.
+        /// </summary>
+        private int _numSides;
+
+        /// <summary>
         /// Builds mesh.
         /// </summary>
-        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
+        public override void Start(Mesh mesh, GeometryBuilderSettings settings)
         {
-            var cylinderSettings = (CylinderGeometryBuilderSettings) settings;
-            
-            var numSides = Mathf.Max(3, cylinderSettings.NumSides);
+            _settings = (CylinderGeometryBuilderSettings) settings;
+
+            _numSides = Mathf.Max(3, _settings.NumSides);
 
             // calculate buffer lengths
-            int numVerts, numTriangles;
-            CalculateBufferLength(numSides, out numVerts, out numTriangles);
-
+            _numCircleVertices = _numSides + 1;
+            _numCircleTriangles = _numSides;
+            
             // top and bottom of cylinder, so multiply by two
-            int numTotalVerts = 2 * numVerts;
-            int numTotalTriangles = 2 * numTriangles;
+            int numTotalVerts = 2 * _numCircleVertices;
+            int numTotalTriangles = 2 * _numCircleTriangles;
 
             // the user may not want the ends filled in
-            if (!cylinderSettings.Endcaps)
+            if (!_settings.Endcaps)
             {
                 numTotalTriangles = 0;
             }
 
             // a quad for each side
-            numTotalTriangles += 2 * numSides;
+            numTotalTriangles += 2 * _numSides;
 
-            var vertices = new Vector3[numTotalVerts];
-            var triangles = new int[numTotalTriangles * 3];
+            _numVertices = numTotalVerts;
+            _numTriangles = numTotalTriangles;
+        }
 
-            var halfHeight = cylinderSettings.Height / 2f;
+        /// <summary>
+        /// Provides layout for cylinder.
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="triangles"></param>
+        public override void Layout(out Vector3[] vertices, out int[] triangles)
+        {
+            var halfHeight = _settings.Height / 2f;
+
+            vertices = new Vector3[_numVertices];
+            triangles = new int[_numTriangles * 3];
 
             // bottom
             {
                 vertices[0] = new Vector3(0f, -halfHeight, 0f);
 
-                var radians = 2f * Mathf.PI / numSides;
-                for (var i = 1; i < numVerts; i++)
+                var radians = 2f * Mathf.PI / _numSides;
+                for (var i = 1; i < _numCircleVertices; i++)
                 {
                     vertices[i] = new Vector3(
                         0.5f * Mathf.Cos(radians * (i - 1)),
@@ -54,9 +85,9 @@ namespace TheGoldenMule.Geo
                         0.5f * Mathf.Sin(radians * (i - 1)));
                 }
 
-                if (cylinderSettings.Endcaps)
+                if (_settings.Endcaps)
                 {
-                    for (var i = 0; i < numTriangles * 3; i += 3)
+                    for (var i = 0; i < _numCircleTriangles * 3; i += 3)
                     {
                         var vertIndex = i / 3 + 1;
 
@@ -64,7 +95,7 @@ namespace TheGoldenMule.Geo
                         triangles[i + 2] = 0;
 
                         vertIndex = vertIndex + 1;
-                        if (vertIndex >= numVerts)
+                        if (vertIndex >= _numCircleVertices)
                         {
                             vertIndex = 1;
                         }
@@ -76,12 +107,12 @@ namespace TheGoldenMule.Geo
 
             // top
             {
-                var startVertIndex = numVerts;
+                var startVertIndex = _numCircleVertices;
 
                 vertices[startVertIndex] = new Vector3(0f, halfHeight, 0f);
 
-                var radians = 2f * Mathf.PI / numSides;
-                for (var i = 1; i < numVerts; i++)
+                var radians = 2f * Mathf.PI / _numSides;
+                for (var i = 1; i < _numCircleVertices; i++)
                 {
                     vertices[startVertIndex + i] = new Vector3(
                         0.5f * Mathf.Cos(radians * (i - 1)),
@@ -89,10 +120,10 @@ namespace TheGoldenMule.Geo
                         0.5f * Mathf.Sin(radians * (i - 1)));
                 }
 
-                if (cylinderSettings.Endcaps)
+                if (_settings.Endcaps)
                 {
-                    var startTriangleIndex = numTriangles * 3;
-                    for (var i = 0; i < numTriangles * 3; i += 3)
+                    var startTriangleIndex = _numCircleTriangles * 3;
+                    for (var i = 0; i < _numCircleTriangles * 3; i += 3)
                     {
                         var vertIndex = startVertIndex + i / 3 + 1;
 
@@ -100,7 +131,7 @@ namespace TheGoldenMule.Geo
                         triangles[startTriangleIndex + i + 1] = startVertIndex;
 
                         vertIndex = vertIndex + 1;
-                        if (vertIndex >= startVertIndex + numVerts)
+                        if (vertIndex >= startVertIndex + _numCircleVertices)
                         {
                             vertIndex = startVertIndex + 1;
                         }
@@ -113,16 +144,16 @@ namespace TheGoldenMule.Geo
             // quads about the edges
             {
                 var bottomVertStart = 1;
-                var topVertStart = numVerts + 1;
+                var topVertStart = _numCircleVertices + 1;
 
-                var bottomVertEnd = numVerts - 1;
-                var topVertEnd = 2 * numVerts - 1;
+                var bottomVertEnd = _numCircleVertices - 1;
+                var topVertEnd = 2 * _numCircleVertices - 1;
 
-                var startTriangleIndex = cylinderSettings.Endcaps
-                    ? 2 * numTriangles * 3
+                var startTriangleIndex = _settings.Endcaps
+                    ? 2 * _numCircleTriangles * 3
                     : 0;
 
-                for (int quad = 0, len = numSides; quad < len; quad++)
+                for (int quad = 0, len = _numSides; quad < len; quad++)
                 {
                     // get 4 corners
                     var topVertIndex = topVertStart + quad;
@@ -151,23 +182,6 @@ namespace TheGoldenMule.Geo
                     triangles[triangleIndex + 5] = bottomVertNextIndex;
                 }
             }
-
-            // remaining transformation + application
-            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
-
-            ApplyAllDefaults(mesh, settings);
-        }
-
-        /// <summary>
-        /// Calculates the number of verts and triangles needed.
-        /// </summary>
-        private static void CalculateBufferLength(
-            int numSides,
-            out int numVerts,
-            out int numTriangles)
-        {
-            numVerts = numSides + 1;
-            numTriangles = numSides;
         }
 
         /// <summary>

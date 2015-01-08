@@ -59,14 +59,10 @@ namespace TheGoldenMule.Geo
             7, 19, 3, 7, 3, 10, 7, 10, 11
         };
 
-        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
+        public override void Layout(out Vector3[] vertices, out int[] triangles)
         {
-            var vertices = Vertices;
-            var triangles = Triangles;
-
-            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
-
-            ApplyAllDefaults(mesh, settings);
+            vertices = Vertices;
+            triangles = Triangles;
         }
     }
 }

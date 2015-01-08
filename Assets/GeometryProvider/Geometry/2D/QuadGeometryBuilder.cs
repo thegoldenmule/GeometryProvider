@@ -11,13 +11,15 @@ namespace TheGoldenMule.Geo
     public class QuadGeometryBuilder : StandardGeometryBuilder
     {
         /// <summary>
-        /// Builds geo for a quad.
+        /// Generates the vertex + triangle layout for a quad.
         /// </summary>
-        public override void Build(
-            Mesh mesh,
-            GeometryBuilderSettings settings)
+        /// <param name="vertices"></param>
+        /// <param name="triangles"></param>
+        public override void Layout(
+            out Vector3[] vertices,
+            out int[] triangles)
         {
-            var vertices = new []
+            vertices = new []
             {
                 new Vector3(-0.5f, 0f, -0.5f),
                 new Vector3(0.5f, 0f, -0.5f),
@@ -25,15 +27,27 @@ namespace TheGoldenMule.Geo
                 new Vector3(-0.5f, 0f, 0.5f)
             };
             
-            var triangles = new []
+            triangles = new []
             {
                 0, 2, 1,
                 0, 3, 2
             };
+        }
 
-            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
-
-            ApplyAllDefaults(mesh, settings);
+        /// <summary>
+        /// Generates UVs for a quad.
+        /// </summary>
+        /// <param name="uvs"></param>
+        /// <param name="settings"></param>
+        public override void UV(out Vector2[] uvs, GeometryBuilderUVSettings settings)
+        {
+            uvs = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(1, 1),
+                new Vector2(0, 1)
+            };
         }
 
         /// <summary>

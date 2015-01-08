@@ -1,8 +1,11 @@
-﻿namespace TheGoldenMule.Geo
+﻿using System;
+
+namespace TheGoldenMule.Geo
 {
     /// <summary>
     /// Custom settings object for cylinders.
     /// </summary>
+    [Serializable]
     public class CylinderGeometryBuilderSettings : CircleGeometryBuilderSettings
     {
         /// <summary>

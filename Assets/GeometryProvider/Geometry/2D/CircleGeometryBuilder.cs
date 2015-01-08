@@ -12,35 +12,62 @@ namespace TheGoldenMule.Geo
     public class CircleGeometryBuilder : StandardGeometryBuilder
     {
         /// <summary>
+        /// Settings.
+        /// </summary>
+        private CircleGeometryBuilderSettings _settings;
+
+        /// <summary>
+        /// Number of sides.
+        /// </summary>
+        private int _numSides;
+
+        /// <summary>
         /// Builds geometry for a circle.
         /// </summary>
-        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
+        public override void Start(Mesh mesh, GeometryBuilderSettings settings)
         {
-            var polygonSettings = (CircleGeometryBuilderSettings) settings;
+            base.Start(mesh, settings);
 
-            var numSides = Mathf.Max(3, polygonSettings.NumSides);
+            _settings = (CircleGeometryBuilderSettings) settings;
+            _numSides = Mathf.Max(3, _settings.NumSides);
 
-            int numVerts, numTriangles;
-            CalculateBufferLength(numSides, out numVerts, out numTriangles);
-            var numIndices = numTriangles * 3;
+            CalculateBufferLength(_numSides, out _numVertices, out _numTriangles);
+        }
 
-            var vertices = new Vector3[numVerts];
-            var triangles = new int[numIndices];
+        /// <summary>
+        /// Returns circle geo.
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="triangles"></param>
+        public override void Layout(out Vector3[] vertices, out int[] triangles)
+        {
+            var numIndices = _numTriangles * 3;
+
+            vertices = new Vector3[_numVertices];
+            triangles = new int[numIndices];
 
             BuildCircle(
-                numSides,
+                _numSides,
                 ref vertices,
                 ref triangles);
+        }
 
-            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
+        /// <summary>
+        /// Builds circle UVs.
+        /// </summary>
+        public override void UV(out Vector2[] uvs, GeometryBuilderUVSettings settings)
+        {
+            uvs = new Vector2[_numVertices];
 
-            ApplyAllDefaults(mesh, settings);
+            BuildCircleUVs(
+                _numSides,
+                ref uvs);
         }
 
         /// <summary>
         /// Calculates the number of verts and triangles needed.
         /// </summary>
-        public static void CalculateBufferLength(
+        protected void CalculateBufferLength(
             int numSides,
             out int numVerts,
             out int numTriangles)
@@ -50,9 +77,33 @@ namespace TheGoldenMule.Geo
         }
 
         /// <summary>
+        /// Builds uv buffer.
+        /// </summary>
+        /// <param name="numSides"></param>
+        /// <param name="uvs"></param>
+        protected void BuildCircleUVs(
+            int numSides,
+            ref Vector2[] uvs)
+        {
+            int numVerts, numTriangles;
+            CalculateBufferLength(numSides, out numVerts, out numTriangles);
+
+            uvs[0] = new Vector2(0.5f, 0.5f);
+
+            var radians = 2f * Mathf.PI / numSides;
+            for (var i = 1; i < numVerts; i++)
+            {
+                var cosine = Mathf.Cos(radians * (i - 1));
+                var sine = Mathf.Sin(radians * (i - 1));
+
+                uvs[i] = Vector2.one + 0.5f * new Vector2(cosine, sine);
+            }
+        }
+
+        /// <summary>
         /// Actually builds the vertex and index buffers.
         /// </summary>
-        public static void BuildCircle(
+        protected void BuildCircle(
             int numSides,
             ref Vector3[] vertices,
             ref int[] triangles)
@@ -65,10 +116,13 @@ namespace TheGoldenMule.Geo
             var radians = 2f * Mathf.PI / numSides;
             for (var i = 1; i < numVerts; i++)
             {
+                var cosine = Mathf.Cos(radians * (i - 1));
+                var sine = Mathf.Sin(radians * (i - 1));
+                
                 vertices[i] = 0.5f * new Vector3(
-                        Mathf.Cos(radians * (i - 1)),
+                        cosine,
                         0f,
-                        Mathf.Sin(radians * (i - 1)));
+                        sine);
             }
 
             for (var i = 0; i < numTriangles * 3; i += 3)

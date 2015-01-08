@@ -54,17 +54,10 @@ namespace TheGoldenMule.Geo
             new Vector3(-0.850650808352039932f, -0.525731112119133606f, 0f)
 		};
 
-        /// <summary>
-        /// Builds an icosahedron.
-        /// </summary>
-        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
+        public override void Layout(out Vector3[] vertices, out int[] triangles)
         {
-            var vertices = Vertices;
-            var triangles = Triangles;
-
-            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
-
-            ApplyAllDefaults(mesh, settings);
+            vertices = Vertices;
+            triangles = Triangles;
         }
     }
 }

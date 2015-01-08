@@ -4,37 +4,51 @@ using UnityEngine;
 namespace TheGoldenMule.Geo
 {
     /// <summary>
+    /// Specifies method of combining colors.
+    /// </summary>
+    public enum BlendMode
+    {
+        Additive,
+        Subtractive,
+        Multiplicative
+    }
+
+    /// <summary>
     /// Holds Color data.
     /// </summary>
     [Serializable]
-    public class GeometryBuilderColorSettings : GeometryBuilderBufferSettings
+    public class GeometryBuilderColorSettings : GeometryBuilderBufferSettings<Color>
     {
+        /// <summary>
+        /// Transforms.
+        /// </summary>
+        private static readonly Func<Color, Color, Color>[] _colorMethods = 
+        {
+            (a, b) => a + b,
+            (a, b) => a - b,
+            (a, b) => a * b
+        };
+
+        /// <summary>
+        /// Tint color.
+        /// </summary>
         public Color Tint = Color.white;
 
-        public GeometryBuilderColorSettings()
+        /// <summary>
+        /// BlendMode of combining colors.
+        /// </summary>
+        public BlendMode BlendMode;
+
+        /// <summary>
+        /// Transforms colors.
+        /// </summary>
+        /// <param name="buffer"></param>
+        public override void Transform(ref Color[] buffer)
         {
-            Buffer = Buffer.Color;
-        }
-
-        public override void ApplyDefault(Mesh mesh)
-        {
-            if (Enabled)
+            var func = _colorMethods[(int) BlendMode];
+            for (int i = 0, len = buffer.Length; i < len; i++)
             {
-                var numVerts = mesh.vertexCount;
-
-                var colors = new Color[numVerts];
-                for (int i = 0; i < numVerts; i++)
-                {
-                    colors[i] = Tint;
-                }
-
-                var colorObj = (object) colors;
-                mesh.SetBuffer(Buffer, ref colorObj);
-            }
-            else
-            {
-                object nullObj = null;
-                mesh.SetBuffer(Buffer, ref nullObj);
+                buffer[i] = func(buffer[i], Tint);
             }
         }
     }

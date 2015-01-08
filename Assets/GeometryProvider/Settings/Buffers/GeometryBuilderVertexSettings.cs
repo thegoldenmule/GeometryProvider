@@ -41,38 +41,54 @@ namespace TheGoldenMule.Geo
         /// <param name="mesh"></param>
         /// <param name="vertices"></param>
         /// <param name="triangles"></param>
-        public virtual void TransformAndApply(
-            Mesh mesh,
+        public virtual void Transform(
             ref Vector3[] vertices,
             ref int[] triangles)
         {
-            // apply TRS
-            var transformation = Matrix4x4.TRS(
-                Translation,
-                Rotation,
-                Scale);
-            for (int i = 0, len = vertices.Length; i < len; i++)
-            {
-                vertices[i] = transformation.MultiplyPoint(vertices[i]);
-            }
+            // apply vertex transforms
+            TransformVertices(ref vertices);
 
-            // apply appropriate index transforms
-            if (DoubleSided)
-            {
-                int[] newTriangleBuffer;
-                TransformDoubleSided(ref triangles, out newTriangleBuffer);
+            // apply triangle transforms
+            TransformTriangles(ref triangles);
+        }
 
-                mesh.Apply(ref vertices, ref newTriangleBuffer);
-            }
-            else if (ReverseWinding)
+        /// <summary>
+        /// Performs vertex transformations.
+        /// </summary>
+        /// <param name="vertices"></param>
+        protected virtual void TransformVertices(ref Vector3[] vertices)
+        {
+            if (null != vertices)
             {
-                TransformReverseWinding(ref triangles);
+                var transformation = Matrix4x4.TRS(
+                    Translation,
+                    Rotation,
+                    Scale);
+                for (int i = 0, len = vertices.Length; i < len; i++)
+                {
+                    vertices[i] = transformation.MultiplyPoint(vertices[i]);
+                }
+            }
+        }
 
-                mesh.Apply(ref vertices, ref triangles);
-            }
-            else
+        /// <summary>
+        /// Performs triangle transformations.
+        /// </summary>
+        /// <param name="triangles"></param>
+        protected virtual void TransformTriangles(ref int[] triangles)
+        {
+            if (null != triangles)
             {
-                mesh.Apply(ref vertices, ref triangles);
+                if (DoubleSided)
+                {
+                    int[] newTriangleBuffer;
+                    TransformDoubleSided(ref triangles, out newTriangleBuffer);
+                    triangles = newTriangleBuffer;
+                }
+                else if (ReverseWinding)
+                {
+                    TransformReverseWinding(ref triangles);
+                }
             }
         }
 

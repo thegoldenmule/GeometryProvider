@@ -19,11 +19,11 @@ namespace TheGoldenMule.Geo.Editor
             
             var geosphereSettings = (GeosphereGeometryBuilderSettings) settings;
 
-            geosphereSettings.Quality = Mathf.Max(
+            geosphereSettings.Subdivisions = Mathf.Max(
                 1,
                 EditorGUILayout.IntSlider(
-                    "Quality",
-                    geosphereSettings.Quality,
+                    "Subdivisions",
+                    geosphereSettings.Subdivisions,
                     0, 4));
         }
 

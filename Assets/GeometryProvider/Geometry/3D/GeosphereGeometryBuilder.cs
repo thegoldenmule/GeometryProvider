@@ -12,25 +12,36 @@ namespace TheGoldenMule.Geo
     public class GeosphereGeometryBuilder : StandardGeometryBuilder
     {
         /// <summary>
-        /// Builds Geosphere.
+        /// Settings for a Geosphere.
         /// </summary>
-        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
+        private GeosphereGeometryBuilderSettings _settings;
+
+        /// <summary>
+        /// Starts the build flow.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <param name="settings"></param>
+        public override void Start(Mesh mesh, GeometryBuilderSettings settings)
         {
-            var geosphereSettings = (GeosphereGeometryBuilderSettings) settings;
+            _settings = (GeosphereGeometryBuilderSettings) settings;
+        }
 
-            var vertices = IcosahedronGeometryBuilder.Vertices;
-            var triangles = IcosahedronGeometryBuilder.Triangles;
+        /// <summary>
+        /// Retrieves the geometry layout.
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="triangles"></param>
+        public override void Layout(out Vector3[] vertices, out int[] triangles)
+        {
+            vertices = IcosahedronGeometryBuilder.Vertices;
+            triangles = IcosahedronGeometryBuilder.Triangles;
 
-            for (int i = 0, len = geosphereSettings.Quality; i < len; i++)
+            for (int i = 0, len = _settings.Subdivisions; i < len; i++)
             {
                 MeshExtensions.Subdivide(ref vertices, ref triangles);
             }
 
             Normalize(ref vertices);
-
-            settings.Vertex.TransformAndApply(mesh, ref vertices, ref triangles);
-
-            ApplyAllDefaults(mesh, settings);
         }
 
         /// <summary>

@@ -4,6 +4,21 @@ using UnityEngine;
 namespace TheGoldenMule.Geo
 {
     /// <summary>
+    /// UV mapping methods.
+    /// </summary>
+    public enum UVMapMethod
+    {
+        // maps UVs in the default manner
+        Default,
+
+        // if possible, tries to map faces 1-1 to UV space (no stretching)
+        MatchFace,
+
+        // each face is mapped to the same set of UV coordinates
+        RepeatFace
+    }
+
+    /// <summary>
     /// Defines a rotation in UV space. You can do cool stuff with this!
     /// </summary>
     [Serializable]
@@ -32,8 +47,13 @@ namespace TheGoldenMule.Geo
     /// A settings object that holds UV transformations.
     /// </summary>
     [Serializable]
-    public class GeometryBuilderUVSettings : GeometryBuilderBufferSettings
+    public class GeometryBuilderUVSettings : GeometryBuilderBufferSettings<Vector2>
     {
+        /// <summary>
+        /// Describes the method of mapping UVs.
+        /// </summary>
+        public UVMapMethod MapMethod;
+
         /// <summary>
         /// UV space is [0, 1] x [0, 1]. With this Rect, you can specify a new
         /// space to map to. Essentially, this gives control over UV
@@ -57,26 +77,12 @@ namespace TheGoldenMule.Geo
         public UVRotation Rotation = new UVRotation();
 
         /// <summary>
-        /// Creates a new settings object for UVs.
-        /// </summary>
-        public GeometryBuilderUVSettings()
-        {
-            Buffer = Buffer.UV;
-        }
-
-        /// <summary>
         /// Transforms UVs.
         /// </summary>
-        public virtual void TransformAndApply(Mesh mesh, ref Vector2[] uvs)
+        public override void Transform(ref Vector2[] buffer)
         {
-            if (Enabled)
-            {
-                TransformWithRect(ref uvs);
-                TransformWithRotation(ref uvs);
-
-                var uvObject = (object) uvs;
-                mesh.SetBuffer(Buffer, ref uvObject);
-            }
+            TransformWithRect(ref buffer);
+            TransformWithRotation(ref buffer);
         }
 
         /// <summary>

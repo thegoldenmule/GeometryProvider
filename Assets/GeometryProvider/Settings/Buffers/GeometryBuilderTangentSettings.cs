@@ -7,27 +7,25 @@ namespace TheGoldenMule.Geo
     /// Holds tangent data.
     /// </summary>
     [Serializable]
-    public class GeometryBuilderTangentSettings : GeometryBuilderBufferSettings
+    public class GeometryBuilderTangentSettings : GeometryBuilderBufferSettings<Vector3>
     {
-        public bool Generate = true;
+        /// <summary>
+        /// If true, inverts normals.
+        /// </summary>
+        public bool Invert = false;
 
-        public GeometryBuilderTangentSettings()
+        /// <summary>
+        /// Transforms vectors.
+        /// </summary>
+        /// <param name="buffer"></param>
+        public override void Transform(ref Vector3[] buffer)
         {
-            Buffer = Buffer.Tangent;
-        }
-
-        public override void ApplyDefault(Mesh mesh)
-        {
-            base.ApplyDefault(mesh);
-
-            if (Enabled)
+            if (Invert)
             {
-                // TODO: this won't work if we chose a different buffer!
-                mesh.RecalculateTangents();
-            }
-            else
-            {
-                mesh.tangents = null;
+                for (int i = 0, len = buffer.Length; i < len; i++)
+                {
+                    buffer[i] = -buffer[i];
+                }
             }
         }
     }

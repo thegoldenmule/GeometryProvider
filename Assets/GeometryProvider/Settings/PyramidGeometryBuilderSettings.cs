@@ -1,8 +1,11 @@
-﻿namespace TheGoldenMule.Geo
+﻿using System;
+
+namespace TheGoldenMule.Geo
 {
     /// <summary>
     /// Builds a pyramid.
     /// </summary>
+    [Serializable]
     public class PyramidGeometryBuilderSettings : GeometryBuilderSettings
     {
         /// <summary>

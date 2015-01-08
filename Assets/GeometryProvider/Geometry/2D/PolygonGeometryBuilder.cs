@@ -8,14 +8,6 @@ namespace TheGoldenMule.Geo
     public class PolygonGeometryBuilder : StandardGeometryBuilder
     {
         /// <summary>
-        /// Builds the mesh.
-        /// </summary>
-        public override void Build(Mesh mesh, GeometryBuilderSettings settings)
-        {
-            int numVerts, numTriangles;
-        }
-
-        /// <summary>
         /// Custom factory for Polygon settings.
         /// </summary>
         [CustomFactory(typeof(PolygonGeometryBuilder))]

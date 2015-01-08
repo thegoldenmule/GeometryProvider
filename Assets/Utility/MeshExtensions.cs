@@ -12,7 +12,7 @@ public static class MeshExtensions
     /// In order to avoid expensive Mesh::Clear() calls, the order in which
     /// the vert and index buffers are assigned to the mesh matters.
     /// </summary>
-    public static void Apply(this Mesh @this, ref Vector3[] vertices, ref int[] indices)
+    public static void SetLayout(this Mesh @this, ref Vector3[] vertices, ref int[] indices)
     {
         if (@this.vertexCount > vertices.Length)
         {
@@ -23,52 +23,6 @@ public static class MeshExtensions
         {
             @this.vertices = vertices;
             @this.triangles = indices;
-        }
-    }
-
-    /// <summary>
-    /// Sets a buffer.
-    /// </summary>
-    public static void SetBuffer(this Mesh @this, Buffer buffer, ref object contents)
-    {
-        switch (buffer)
-        {
-            case Buffer.Vertex:
-            {
-                @this.vertices = (Vector3[]) contents;
-
-                break;
-            }
-            case Buffer.UV:
-            {
-                @this.uv = (Vector2[]) contents;
-
-                break;
-            }
-            case Buffer.UV2:
-            {
-                @this.uv2 = (Vector2[]) contents;
-
-                break;
-            }
-            case Buffer.Color:
-            {
-                @this.colors = (Color[]) contents;
-
-                break;
-            }
-            case Buffer.Normal:
-            {
-                @this.normals = (Vector3[]) contents;
-
-                break;
-            }
-            case Buffer.Tangent:
-            {
-                @this.tangents = (Vector4[]) contents;
-
-                break;
-            }
         }
     }
 

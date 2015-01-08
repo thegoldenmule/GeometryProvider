@@ -51,14 +51,14 @@ namespace TheGoldenMule.Geo.Editor
             DrawIntro(settings);
             EditorGUILayout.Separator();
 
-            if (Foldout("Primitive"))
+            if (Foldout("Primitive", true))
             {
                 EditorGUI.indentLevel++;
 
                 DrawCustomControls(settings);
                 EditorGUILayout.Separator();
 
-                EditorGUI.indentLevel++;
+                EditorGUI.indentLevel--;
             }
 
             DrawTestControls(settings);
@@ -73,6 +73,9 @@ namespace TheGoldenMule.Geo.Editor
             DrawUVControls(settings, settings.UV, "UV");
             EditorGUILayout.Separator();
 
+            DrawUVControls(settings, settings.UV1, "UV1");
+            EditorGUILayout.Separator();
+            
             DrawUVControls(settings, settings.UV2, "UV2");
             EditorGUILayout.Separator();
 
@@ -159,7 +162,11 @@ namespace TheGoldenMule.Geo.Editor
         /// </summary>
         /// <param name="settings"></param>
         /// <param name="uv"></param>
-        protected virtual void DrawUVControls(GeometryBuilderSettings settings, GeometryBuilderUVSettings uv, string label)
+        /// <param name="label"></param>
+        protected virtual void DrawUVControls(
+            GeometryBuilderSettings settings,
+            GeometryBuilderUVSettings uv,
+            string label)
         {
             if (Foldout(label))
             {
@@ -167,6 +174,7 @@ namespace TheGoldenMule.Geo.Editor
 
                 DrawBufferControls(uv);
 
+                uv.MapMethod = (UVMapMethod) EditorGUILayout.EnumPopup("Map Mathod", uv.MapMethod);
                 uv.Rect = EditorGUILayout.RectField("Rect", uv.Rect);
 
                 EditorGUILayout.BeginHorizontal();
@@ -189,7 +197,12 @@ namespace TheGoldenMule.Geo.Editor
                 EditorGUI.indentLevel++;
 
                 DrawBufferControls(settings.Color);
-                settings.Color.Tint = EditorGUILayout.ColorField("Color", settings.Color.Tint);
+                settings.Color.Tint = EditorGUILayout.ColorField(
+                    "Color",
+                    settings.Color.Tint);
+                settings.Color.BlendMode = (BlendMode) EditorGUILayout.EnumPopup(
+                    "Blend Mode",
+                    settings.Color.BlendMode);
 
                 EditorGUI.indentLevel--;
             }
@@ -206,7 +219,7 @@ namespace TheGoldenMule.Geo.Editor
                 EditorGUI.indentLevel++;
 
                 DrawBufferControls(settings.Normals);
-                settings.Normals.Generate = EditorGUILayout.Toggle("Generate", settings.Normals.Generate);
+                settings.Normals.Invert = EditorGUILayout.Toggle("Invert", settings.Normals.Invert);
 
                 EditorGUI.indentLevel--;
             }
@@ -223,7 +236,7 @@ namespace TheGoldenMule.Geo.Editor
                 EditorGUI.indentLevel++;
 
                 DrawBufferControls(settings.Tangents);
-                settings.Tangents.Generate = EditorGUILayout.Toggle("Generate", settings.Tangents.Generate);
+                settings.Tangents.Invert = EditorGUILayout.Toggle("Generate", settings.Tangents.Invert);
 
                 EditorGUI.indentLevel--;
             }
@@ -296,7 +309,6 @@ namespace TheGoldenMule.Geo.Editor
         protected virtual void DrawBufferControls(GeometryBuilderBufferSettings bufferSettings)
         {
             bufferSettings.Enabled = EditorGUILayout.Toggle("Enabled", bufferSettings.Enabled);
-            bufferSettings.Buffer = (Buffer)EditorGUILayout.EnumPopup("Buffer", bufferSettings.Buffer);
         }
 
         /// <summary>
