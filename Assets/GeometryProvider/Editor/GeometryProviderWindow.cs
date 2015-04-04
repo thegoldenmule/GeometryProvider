@@ -10,6 +10,63 @@ namespace TheGoldenMule.Geo.Editor
 
     public class GeometryProviderWindow : EditorWindow
     {
+        private static readonly Material DefaultMaterial;
+
+        static GeometryProviderWindow()
+        {
+            DefaultMaterial = new Material(Shader.Find("Diffuse"))
+            {
+                mainTexture = GenerateTestTexture()
+            
+            };
+        }
+
+        private static Texture2D GenerateTestTexture()
+        {
+            const int DIM = 128;
+            const int LEN = DIM * DIM;
+            const int PATTERN_DIM = 16;
+
+            var checkerboard = new Texture2D(DIM, DIM, TextureFormat.RGBA32, true, true);
+
+            var colors = new Color[LEN];
+            for (var x = 0; x < DIM; x++)
+            {
+                for (var y = 0; y < DIM; y++)
+                {
+                    var index = x + y * DIM;
+
+                    if (0 == (x / PATTERN_DIM) % 2)
+                    {
+                        if (1 == (y / PATTERN_DIM) % 2)
+                        {
+                            colors[index] = Color.white;
+                        }
+                        else
+                        {
+                            colors[index] = Color.black;
+                        }
+                    }
+                    else
+                    {
+                        if (1 == (y / PATTERN_DIM) % 2)
+                        {
+                            colors[index] = Color.black;
+                        }
+                        else
+                        {
+                            colors[index] = Color.white;
+                        }
+                    }
+                }
+            }
+
+            checkerboard.SetPixels(colors);
+            checkerboard.Apply(true);
+
+            return checkerboard;
+        }
+
         private readonly List<string> _builderNames = new List<string>();
         private readonly List<IGeometryBuilderRenderer> _renderers = new List<IGeometryBuilderRenderer>();
 
@@ -72,12 +129,8 @@ namespace TheGoldenMule.Geo.Editor
             _gameObject = CreateGameObject("Primitive");
             _mesh = new Mesh();
 
-            Debug.Log(_mesh.colors.Length);
-            
             _gameObject.GetComponent<MeshFilter>().sharedMesh = _mesh;
-            _mesh = _gameObject.GetComponent<MeshFilter>().sharedMesh;
-
-            Debug.Log(_mesh.colors.Length);
+            _gameObject.GetComponent<MeshRenderer>().sharedMaterial = DefaultMaterial;
 
             // select the new primitive
             EditorUtility.SelectAndFocus(_gameObject.transform);
@@ -86,11 +139,7 @@ namespace TheGoldenMule.Geo.Editor
                 _renderer.Selected = _gameObject.transform;
             }
 
-            Debug.Log(_mesh.colors.Length);
-
             OnUpdatePrimitive();
-
-            Debug.Log(_mesh.colors.Length);
         }
 
         private void OnUpdatePrimitive()
@@ -103,8 +152,7 @@ namespace TheGoldenMule.Geo.Editor
             var gameObject = new GameObject(name);
 
             gameObject.AddComponent<MeshFilter>();
-            var renderer = gameObject.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = new Material(Shader.Find("Diffuse"));
+            gameObject.AddComponent<MeshRenderer>().sharedMaterial = DefaultMaterial;
 
             return gameObject;
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,8 +27,8 @@ namespace TheGoldenMule.Geo.Editor
         /// </summary>
         protected Vector2 _scrollPosition;
         protected string _buildTabState;
-        protected readonly Dictionary<string, bool> _foldouts = new Dictionary<string, bool>(); 
-        
+        protected readonly Dictionary<string, bool> _foldouts = new Dictionary<string, bool>();
+
         /// <summary>
         /// Sets the selected Transform for updates.
         /// </summary>
@@ -60,9 +60,6 @@ namespace TheGoldenMule.Geo.Editor
 
                 EditorGUI.indentLevel--;
             }
-
-            DrawTestControls(settings);
-            EditorGUILayout.Separator();
 
             DrawVertexControls(settings);
             EditorGUILayout.Separator();
@@ -101,15 +98,6 @@ namespace TheGoldenMule.Geo.Editor
             EditorGUI.indentLevel++;
             GUILayout.TextArea(settings.Description ?? "");
             EditorGUI.indentLevel--;
-        }
-
-        /// <summary>
-        /// Draws controls for testing.
-        /// </summary>
-        /// <param name="settings"></param>
-        protected virtual void DrawTestControls(GeometryBuilderSettings settings)
-        {
-            
         }
 
         /// <summary>
@@ -168,19 +156,18 @@ namespace TheGoldenMule.Geo.Editor
             GeometryBuilderUVSettings uv,
             string label)
         {
-            if (Foldout(label))
+            bool enabled = uv.Enabled = ToggleFoldout(label);
+            if (enabled)
             {
                 EditorGUI.indentLevel++;
 
-                DrawBufferControls(uv);
-
-                uv.MapMethod = (UVMapMethod) EditorGUILayout.EnumPopup("Map Mathod", uv.MapMethod);
                 uv.Rect = EditorGUILayout.RectField("Rect", uv.Rect);
 
-                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Rotation");
+                EditorGUI.indentLevel++;
                 uv.Rotation.Origin = EditorGUILayout.Vector2Field("Origin", uv.Rotation.Origin);
                 uv.Rotation.Theta = EditorGUILayout.FloatField("Theta", uv.Rotation.Theta);
-                EditorGUILayout.EndHorizontal();
+                EditorGUI.indentLevel--;
 
                 EditorGUI.indentLevel--;
             }
@@ -192,11 +179,11 @@ namespace TheGoldenMule.Geo.Editor
         /// <param name="settings"></param>
         protected virtual void DrawColorControls(GeometryBuilderSettings settings)
         {
-            if (Foldout("Color"))
+            bool enabled = settings.Color.Enabled = ToggleFoldout("Color");
+            if (enabled)
             {
                 EditorGUI.indentLevel++;
 
-                DrawBufferControls(settings.Color);
                 settings.Color.Tint = EditorGUILayout.ColorField(
                     "Color",
                     settings.Color.Tint);
@@ -214,11 +201,11 @@ namespace TheGoldenMule.Geo.Editor
         /// <param name="settings"></param>
         protected virtual void DrawNormalControls(GeometryBuilderSettings settings)
         {
-            if (Foldout("Normals"))
+            bool enabled = settings.Normals.Enabled = ToggleFoldout("Normals");
+            if (enabled)
             {
                 EditorGUI.indentLevel++;
 
-                DrawBufferControls(settings.Normals);
                 settings.Normals.Invert = EditorGUILayout.Toggle("Invert", settings.Normals.Invert);
 
                 EditorGUI.indentLevel--;
@@ -231,11 +218,11 @@ namespace TheGoldenMule.Geo.Editor
         /// <param name="settings"></param>
         protected virtual void DrawTangentControls(GeometryBuilderSettings settings)
         {
-            if (Foldout("Tangents"))
+            bool enabled = settings.Tangents.Enabled = ToggleFoldout("Tangents");
+            if (enabled)
             {
                 EditorGUI.indentLevel++;
 
-                DrawBufferControls(settings.Tangents);
                 settings.Tangents.Invert = EditorGUILayout.Toggle("Generate", settings.Tangents.Invert);
 
                 EditorGUI.indentLevel--;
@@ -248,7 +235,7 @@ namespace TheGoldenMule.Geo.Editor
         /// <param name="settings"></param>
         protected virtual void DrawBuildControls(GeometryBuilderSettings settings)
         {
-            if (Foldout("Build", true))
+            if (ToggleFoldout("Build", true))
             {
                 _buildTabState = EditorUtility.DrawTabs(
                     _buildTabState,
@@ -303,15 +290,6 @@ namespace TheGoldenMule.Geo.Editor
         }
 
         /// <summary>
-        /// Draws controls for buffer settings.
-        /// </summary>
-        /// <param name="bufferSettings"></param>
-        protected virtual void DrawBufferControls(GeometryBuilderBufferSettings bufferSettings)
-        {
-            bufferSettings.Enabled = EditorGUILayout.Toggle("Enabled", bufferSettings.Enabled);
-        }
-
-        /// <summary>
         /// Draws a generic foldout.
         /// </summary>
         protected virtual bool Foldout(string name, bool defaultValue = false)
@@ -322,6 +300,20 @@ namespace TheGoldenMule.Geo.Editor
             }
 
             var value = _foldouts[name] = EditorGUILayout.Foldout(_foldouts[name], name);
+            return value;
+        }
+
+        /// <summary>
+        /// Draws a foldout witha  checkbox.
+        /// </summary>
+        protected virtual bool ToggleFoldout(string name, bool defaultValue = false)
+        {
+            if (!_foldouts.ContainsKey(name))
+            {
+                _foldouts[name] = defaultValue;
+            }
+
+            var value = _foldouts[name] = EditorGUILayout.Toggle(name, _foldouts[name]);
             return value;
         }
 

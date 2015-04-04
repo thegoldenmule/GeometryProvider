@@ -16,19 +16,19 @@ namespace TheGoldenMule.Geo
         private CylinderGeometryBuilderSettings _settings;
 
         /// <summary>
-        /// Number of verts in a circle.
-        /// </summary>
-        private int _numCircleVertices;
-
-        /// <summary>
-        /// Number of triangles in a circle.
-        /// </summary>
-        private int _numCircleTriangles;
-
-        /// <summary>
         /// Number of sides in a circle.
         /// </summary>
         private int _numSides;
+
+        /// <summary>
+        /// Various lookups into vert buffer.
+        /// </summary>
+        private int _startVertSideCircleTop = 0;
+        private int _startVertSideCircleBottom = 0;
+        private int _startVertCircleTop = 0;
+        private int _startVertCircleBottom = 0;
+        private int _startTriangleCircleTop = 0;
+        private int _startTriangleCircleBottom = 0;
 
         /// <summary>
         /// Builds mesh.
@@ -40,24 +40,36 @@ namespace TheGoldenMule.Geo
             _numSides = Mathf.Max(3, _settings.NumSides);
 
             // calculate buffer lengths
-            _numCircleVertices = _numSides + 1;
-            _numCircleTriangles = _numSides;
-            
-            // top and bottom of cylinder, so multiply by two
-            int numTotalVerts = 2 * _numCircleVertices;
-            int numTotalTriangles = 2 * _numCircleTriangles;
 
-            // the user may not want the ends filled in
-            if (!_settings.Endcaps)
+            // start with sides
+            int numTotalVerts = 2 * _numSides;
+            int numTotalTriangles = 2 * _numSides;
+
+            // add endcaps
+            if (_settings.Endcaps)
             {
-                numTotalTriangles = 0;
+                numTotalVerts += 2 * (_numSides + 1);
+                numTotalTriangles += 2 * _numSides;
             }
-
-            // a quad for each side
-            numTotalTriangles += 2 * _numSides;
 
             _numVertices = numTotalVerts;
             _numTriangles = numTotalTriangles;
+
+            _startVertSideCircleTop = 0;
+            _startVertSideCircleBottom = _numSides;
+            _startVertCircleTop = 2 * _numSides;
+            _startVertCircleBottom = _startVertCircleTop + _numSides + 1;
+
+            _startTriangleCircleTop = _numSides * 6;
+            _startTriangleCircleBottom = _startTriangleCircleBottom + 3 * _numSides;
+
+            Debug.Log("NumSides : " + _numSides);
+            Debug.Log("NumVerts : " + _numVertices);
+            Debug.Log("NumTris  : " + _numTriangles);
+            Debug.Log("StartVertSideCircleTop : " + _startVertSideCircleTop);
+            Debug.Log("StartVertSideCircleBottom : " + _startVertSideCircleBottom);
+            Debug.Log("StartVertCircleTop : " + _startVertCircleTop);
+            Debug.Log("StartVertCircleBottom : " + _startVertCircleBottom);
         }
 
         /// <summary>
@@ -72,106 +84,47 @@ namespace TheGoldenMule.Geo
             vertices = new Vector3[_numVertices];
             triangles = new int[_numTriangles * 3];
 
-            // bottom
+            // sides
             {
-                vertices[0] = new Vector3(0f, -halfHeight, 0f);
-
+                // make two circles back to back
                 var radians = 2f * Mathf.PI / _numSides;
-                for (var i = 1; i < _numCircleVertices; i++)
+                for (var i = 0; i < _numSides; i++)
                 {
-                    vertices[i] = new Vector3(
-                        0.5f * Mathf.Cos(radians * (i - 1)),
-                        -halfHeight,
-                        0.5f * Mathf.Sin(radians * (i - 1)));
+                    var cosine = Mathf.Cos(radians * (i - 1));
+                    var sine = Mathf.Sin(radians * (i - 1));
+
+                    vertices[_startVertSideCircleBottom + i] = 0.5f * new Vector3(
+                            cosine,
+                            -halfHeight,
+                            sine);
+                    vertices[_startVertSideCircleTop + i] = 0.5f * new Vector3(
+                            cosine,
+                            halfHeight,
+                            sine);
                 }
 
-                if (_settings.Endcaps)
-                {
-                    for (var i = 0; i < _numCircleTriangles * 3; i += 3)
-                    {
-                        var vertIndex = i / 3 + 1;
-
-                        triangles[i] = vertIndex;
-                        triangles[i + 2] = 0;
-
-                        vertIndex = vertIndex + 1;
-                        if (vertIndex >= _numCircleVertices)
-                        {
-                            vertIndex = 1;
-                        }
-
-                        triangles[i + 1] = vertIndex;
-                    }
-                }
-            }
-
-            // top
-            {
-                var startVertIndex = _numCircleVertices;
-
-                vertices[startVertIndex] = new Vector3(0f, halfHeight, 0f);
-
-                var radians = 2f * Mathf.PI / _numSides;
-                for (var i = 1; i < _numCircleVertices; i++)
-                {
-                    vertices[startVertIndex + i] = new Vector3(
-                        0.5f * Mathf.Cos(radians * (i - 1)),
-                        halfHeight,
-                        0.5f * Mathf.Sin(radians * (i - 1)));
-                }
-
-                if (_settings.Endcaps)
-                {
-                    var startTriangleIndex = _numCircleTriangles * 3;
-                    for (var i = 0; i < _numCircleTriangles * 3; i += 3)
-                    {
-                        var vertIndex = startVertIndex + i / 3 + 1;
-
-                        triangles[startTriangleIndex + i] = vertIndex;
-                        triangles[startTriangleIndex + i + 1] = startVertIndex;
-
-                        vertIndex = vertIndex + 1;
-                        if (vertIndex >= startVertIndex + _numCircleVertices)
-                        {
-                            vertIndex = startVertIndex + 1;
-                        }
-
-                        triangles[startTriangleIndex + i + 2] = vertIndex;
-                    }
-                }
-            }
-
-            // quads about the edges
-            {
-                var bottomVertStart = 1;
-                var topVertStart = _numCircleVertices + 1;
-
-                var bottomVertEnd = _numCircleVertices - 1;
-                var topVertEnd = 2 * _numCircleVertices - 1;
-
-                var startTriangleIndex = _settings.Endcaps
-                    ? 2 * _numCircleTriangles * 3
-                    : 0;
-
+                // now make the sides
+                var topVertEnd = _startVertSideCircleTop + _numSides;
+                var bottomVertEnd = _startVertSideCircleBottom + _numSides;
                 for (int quad = 0, len = _numSides; quad < len; quad++)
                 {
                     // get 4 corners
-                    var topVertIndex = topVertStart + quad;
-                    var bottomVertIndex = bottomVertStart + quad;
+                    var topVertIndex = _startVertSideCircleTop + quad;
+                    var bottomVertIndex = _startVertSideCircleBottom + quad;
 
                     var topVertNextIndex = topVertIndex + 1;
                     if (topVertNextIndex > topVertEnd)
                     {
-                        topVertNextIndex = topVertStart;
+                        topVertNextIndex = _startVertSideCircleTop;
                     }
 
                     var bottomVertNextIndex = bottomVertIndex + 1;
                     if (bottomVertNextIndex > bottomVertEnd)
                     {
-                        bottomVertNextIndex = bottomVertStart;
+                        bottomVertNextIndex = _startVertSideCircleBottom;
                     }
 
-                    var triangleIndex = startTriangleIndex + 6 * quad;
+                    var triangleIndex = 6 * quad;
 
                     triangles[triangleIndex] = topVertIndex;
                     triangles[triangleIndex + 1] = bottomVertNextIndex;
@@ -181,6 +134,114 @@ namespace TheGoldenMule.Geo
                     triangles[triangleIndex + 4] = topVertNextIndex;
                     triangles[triangleIndex + 5] = bottomVertNextIndex;
                 }
+            }
+
+            if (!_settings.Endcaps)
+            {
+                return;
+            }
+
+            // caps
+            {
+                var numCircleVerts = _numSides + 1;
+                var numCircleTriangles = _numSides;
+
+                // top
+                BuildCap(
+                    ref vertices,
+                    ref triangles,
+                    halfHeight,
+                    _startVertCircleTop,
+                    _startTriangleCircleTop);
+
+                // bottom
+                BuildCap(
+                    ref vertices,
+                    ref triangles,
+                    -halfHeight,
+                    _startVertCircleBottom,
+                    _startTriangleCircleBottom);
+            }
+        }
+
+        /// <summary>
+        /// Provides uvs for cylinder.
+        /// </summary>
+        public override void UV(out Vector2[] uvs, GeometryBuilderUVSettings settings)
+        {
+            uvs = new Vector2[_numVertices];
+
+            for (var i = 0; i < _numSides; i++)
+            {
+                var u = (float) i / _numSides;
+                uvs[i] = new Vector2(u, 0);
+                uvs[i + _numSides] = new Vector2(u, 1);
+            }
+
+            if (_settings.Endcaps)
+            {
+                BuildCircleUVs(2 * _numSides, ref uvs);
+                BuildCircleUVs(3 * _numSides + 1, ref uvs);
+            }
+        }
+
+        /// <summary>
+        /// Builds uv buffer for a circle.
+        /// </summary>
+        private void BuildCircleUVs(
+            int startIndex,
+            ref Vector2[] uvs)
+        {
+            uvs[startIndex] = new Vector2(0.5f, 0.5f);
+
+            var radians = 2f * Mathf.PI / _numSides;
+            for (var i = 1; i <= _numSides; i++)
+            {
+                var cosine = Mathf.Cos(radians * (i - 1));
+                var sine = Mathf.Sin(radians * (i - 1));
+
+                uvs[i] = 0.5f * (Vector2.one + new Vector2(cosine, sine));
+            }
+        }
+
+        /// <summary>
+        /// Builds an endcap.
+        /// </summary>
+        private void BuildCap(
+            ref Vector3[] vertices,
+            ref int[] triangles,
+            float y,
+            int startVertIndex,
+            int startTriangleIndex)
+        {
+            var numCircleVerts = _numSides + 1;
+            var numCircleTriangles = _numSides;
+
+            vertices[startVertIndex] = new Vector3(0f, y, 0f);
+
+            var radians = 2f * Mathf.PI / _numSides;
+            for (var i = 1; i < numCircleVerts; i++)
+            {
+                vertices[startVertIndex + i] = new Vector3(
+                    0.5f * Mathf.Cos(radians * (i - 1)),
+                    y,
+                    0.5f * Mathf.Sin(radians * (i - 1)));
+            }
+
+            for (var i = 0; i < numCircleTriangles * 3; i += 3)
+            {
+                var vertIndex = i / 3 + 1;
+
+                triangles[startTriangleIndex + i] = startVertIndex + vertIndex;
+                triangles[startTriangleIndex + i + 2] = startVertIndex;
+
+                vertIndex = vertIndex + 1;
+                if (vertIndex >= numCircleVerts)
+                {
+                    vertIndex = 1;
+                }
+
+                triangles[startTriangleIndex + i + 1] = startVertIndex + vertIndex;
             }
         }
 

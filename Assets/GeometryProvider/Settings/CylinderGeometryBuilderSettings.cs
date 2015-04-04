@@ -3,6 +3,28 @@
 namespace TheGoldenMule.Geo
 {
     /// <summary>
+    /// UV settings for cylinder.
+    /// </summary>
+    [Serializable]
+    public class CylinderGeometryUVSettings : GeometryBuilderUVSettings
+    {
+        /// <summary>
+        /// Describes potential mapping methods.
+        /// </summary>
+        public enum MappingMethod
+        {
+            Cylindrical,
+            Planar,
+            Mixed
+        }
+
+        /// <summary>
+        /// Method of mapping uvs.
+        /// </summary>
+        public MappingMethod Method;
+    }
+
+    /// <summary>
     /// Custom settings object for cylinders.
     /// </summary>
     [Serializable]

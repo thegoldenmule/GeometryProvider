@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 
 namespace TheGoldenMule.Geo
 {
@@ -21,5 +22,6 @@ namespace TheGoldenMule.Geo
                 Mathf.Min(a.b, b.b),
                 Mathf.Min(a.a, b.a));
         }
+
     }
 }

@@ -4,21 +4,6 @@ using UnityEngine;
 namespace TheGoldenMule.Geo
 {
     /// <summary>
-    /// UV mapping methods.
-    /// </summary>
-    public enum UVMapMethod
-    {
-        // maps UVs in the default manner
-        Default,
-
-        // if possible, tries to map faces 1-1 to UV space (no stretching)
-        MatchFace,
-
-        // each face is mapped to the same set of UV coordinates
-        RepeatFace
-    }
-
-    /// <summary>
     /// Defines a rotation in UV space. You can do cool stuff with this!
     /// </summary>
     [Serializable]
@@ -49,11 +34,6 @@ namespace TheGoldenMule.Geo
     [Serializable]
     public class GeometryBuilderUVSettings : GeometryBuilderBufferSettings<Vector2>
     {
-        /// <summary>
-        /// Describes the method of mapping UVs.
-        /// </summary>
-        public UVMapMethod MapMethod;
-
         /// <summary>
         /// UV space is [0, 1] x [0, 1]. With this Rect, you can specify a new
         /// space to map to. Essentially, this gives control over UV
@@ -93,6 +73,11 @@ namespace TheGoldenMule.Geo
         {
             const float epsilon = Mathf.Epsilon;
 
+            if (null == uvs)
+            {
+                return;
+            }
+
             var minx = Rect.x;
             var miny = Rect.y;
             var diffx = Rect.width;
@@ -123,7 +108,7 @@ namespace TheGoldenMule.Geo
         /// </summary>
         protected virtual void TransformWithRotation(ref Vector2[] uvs)
         {
-            if (Rotation.IsDefault())
+            if (Rotation.IsDefault() || null == uvs)
             {
                 return;
             }
